@@ -1,0 +1,186 @@
+{
+    "paths": [
+        {
+            "from": 1,
+            "to": 2,
+            "weight": 50
+        },
+        {
+            "from": 1,
+            "to": 4,
+            "weight": 50
+        },
+        {
+            "from": 1,
+            "to": 5,
+            "weight": 50
+        },
+        {
+            "from": 1,
+            "to": 10,
+            "weight": 50
+        },
+        {
+            "from": 2,
+            "to": 3,
+            "weight": 50
+        },
+        {
+            "from": 2,
+            "to": 5,
+            "weight": 50
+        },
+        {
+            "from": 2,
+            "to": 10,
+            "weight": 50
+        },
+        {
+            "from": 3,
+            "to": 4,
+            "weight": 50
+        },
+        {
+            "from": 3,
+            "to": 5,
+            "weight": 50
+        },
+        {
+            "from": 3,
+            "to": 6,
+            "weight": 50
+        },
+        {
+            "from": 3,
+            "to": 10,
+            "weight": 50
+        },
+        {
+            "from": 4,
+            "to": 5,
+            "weight": 50
+        },
+        {
+            "from": 4,
+            "to": 7,
+            "weight": 50
+        },
+        {
+            "from": 4,
+            "to": 10,
+            "weight": 50
+        },
+        {
+            "from": 5,
+            "to": 6,
+            "weight": 50
+        },
+        {
+            "from": 5,
+            "to": 7,
+            "weight": 50
+        },
+        {
+            "from": 5,
+            "to": 8,
+            "weight": 50
+        },
+        {
+            "from": 5,
+            "to": 9,
+            "weight": 50
+        },
+        {
+            "from": 5,
+            "to": 10,
+            "weight": 50
+        },
+        {
+            "from": 6,
+            "to": 9,
+            "weight": 50
+        },
+        {
+            "from": 7,
+            "to": 8,
+            "weight": 50
+        },
+        {
+            "from": 8,
+            "to": 9,
+            "weight": 50
+        }
+    ],
+    "places": [
+        {
+            "category": "Study",
+            "id": 1,
+            "name": "Library",
+            "x": 100,
+            "y": 100
+        },
+        {
+            "category": "Sports",
+            "id": 2,
+            "name": "Gymnasium",
+            "x": 300,
+            "y": 100
+        },
+        {
+            "category": "Food",
+            "id": 3,
+            "name": "Cafeteria",
+            "x": 500,
+            "y": 100
+        },
+        {
+            "category": "Living",
+            "id": 4,
+            "name": "Dormitory",
+            "x": 100,
+            "y": 300
+        },
+        {
+            "category": "Research",
+            "id": 5,
+            "name": "Laboratory",
+            "x": 300,
+            "y": 300
+        },
+        {
+            "category": "Office",
+            "id": 6,
+            "name": "Administration",
+            "x": 500,
+            "y": 300
+        },
+        {
+            "category": "Events",
+            "id": 7,
+            "name": "Auditorium",
+            "x": 100,
+            "y": 500
+        },
+        {
+            "category": "Medical",
+            "id": 8,
+            "name": "Health Center",
+            "x": 300,
+            "y": 500
+        },
+        {
+            "category": "Sports",
+            "id": 9,
+            "name": "Sports Complex",
+            "x": 500,
+            "y": 500
+        },
+        {
+            "category": "Utility",
+            "id": 10,
+            "name": "Parking Lot",
+            "x": 200,
+            "y": 200
+        }
+    ]
+}
