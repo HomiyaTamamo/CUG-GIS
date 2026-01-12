@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no" />
+  <title>智慧旅游景点导航</title>
+  <link rel="stylesheet" href="./demo_css.css">
+<script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://webapi.amap.com/maps?v=2.0&key=93cb6d89b862a4c38cde5be8923d762d&plugin=AMap.Autocomplete,AMap.PlaceSearch,AMap.Walking"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script src="景区信息.js"></script>
+  <script src="屏幕清理.js"></script>
+  <script src="天气预报.js"></script>
+
+
+</head>
+<body>
+  <div id="cesiumContainer"></div>
+  <div id="centerTitle">
+    <i class="fas fa-map-marked-alt"></i> 智慧旅游景点导航
+  </div>
+
+  <!-- 侧边按钮 -->
+  <button id="switchImageryBtn" class="sideButton">
+    <i class="fas fa-sync-alt"></i>
+    <span>切换影像</span>
+  </button>
+  <button id="quickJumpBtn" class="sideButton">
+    <i class="fas fa-location-arrow"></i>
+    <span>快速导航</span>
+  </button>
+  <button id="introduceBtn" class="sideButton">
+    <i class="fas fa-info-circle"></i>
+    <span>景点简介</span>
+  </button>
+  <button id="ticketBtn" class="sideButton">
+    <i class="fas fa-ticket"></i>
+    <span>门票预订</span>
+  </button>
+  <button id="pathAnalysisBtn" class="sideButton">
+    <i class="fas fa-ruler-combined"></i>
+    <span>距离计算</span>
+  </button>
+  <button id="routePlanningBtn" class="sideButton">
+    <i class="fas fa-route"></i>
+    <span>路线规划</span>
+  </button>
+  <button id="addLabelBtn" class="sideButton">
+    <i class="fas fa-tag"></i>
+    <span>添加标签</span>
+  </button>
+  <button id="clearBtn" class="sideButton">
+    <i class="fas fa-trash-alt"></i>
+    <span>清屏</span>
+  </button>
+
+  <!-- 影像切换面板 -->
+  <div id="imageryPanel" class="panel">
+    <button class="navButton primary" data-imagery="0">
+      <i class="fas fa-map"></i> 高德矢量
+    </button>
+    <button class="navButton secondary" data-imagery="1">
+      <i class="fas fa-satellite"></i> 高德影像
+    </button>
+    <button class="navButton tertiary" data-imagery="2">
+      <i class="fas fa-road"></i> 高德路网
+    </button>
+    <button class="navButton quaternary" data-imagery="3">
+      <i class="fas fa-mountain"></i> Cesium地形
+    </button>
+  </div>
+
+  <!-- 快速跳转地点按钮横排 -->
+  <div id="navPanel" class="panel">
+    <button class="navButton primary">
+      <i class="fas fa-landmark"></i> 故宫
+    </button>
+    <button class="navButton primary">
+      <i class="fas fa-water"></i> 西湖
+    </button>
+    <button class="navButton primary">
+      <i class="fas fa-tree"></i> 九寨沟
+    </button>
+    <button class="navButton primary">
+      <i class="fas fa-tower-broadcast"></i> 东方明珠
+    </button>
+    <button class="navButton primary">
+      <i class="fas fa-place-of-worship"></i> 布达拉宫
+    </button>
+  </div>
+
+  <!-- 景点介绍按钮横排 -->
+  <div id="introducePanel" class="panel">
+    <button class="navButton secondary">
+      <i class="fas fa-book-open"></i> 故宫介绍
+    </button>
+    <button class="navButton secondary">
+      <i class="fas fa-book-open"></i> 西湖介绍
+    </button>
+    <button class="navButton secondary">
+      <i class="fas fa-book-open"></i> 九寨沟介绍
+    </button>
+    <button class="navButton secondary">
+      <i class="fas fa-book-open"></i> 东方明珠介绍
+    </button>
+    <button class="navButton secondary">
+      <i class="fas fa-book-open"></i> 布达拉宫介绍
+    </button>
+  </div>
+  <!-- 景点门票预定按钮横排 -->
+  <div id="toggleTicketPanel" class="panel">
+    <button class="navButton fifth">
+      <i class="fas fa-ticket"></i> 故宫
+    </button>
+    <button class="navButton fifth">
+      <i class="fas fa-ticket"></i> 西湖
+    </button>
+    <button class="navButton fifth">
+      <i class="fas fa-ticket"></i> 九寨沟
+    </button>
+    <button class="navButton fifth">
+      <i class="fas fa-ticket"></i> 东方明珠
+    </button>
+    <button class="navButton fifth">
+      <i class="fas fa-ticket"></i> 布达拉宫
+    </button>
+  </div>
+
+  <!-- 路线规划面板 -->
+  <div id="routePanel" class="panel">
+    <div class="route-section">
+      <h4><i class="fas fa-map-marker-alt"></i> 起点位置</h4>
+      <div class="transport-option active">
+        <div class="transport-icon">
+          <i class="fas fa-location-dot"></i>
+        </div>
+        <div class="transport-info">
+          <h5>当前位置</h5>
+          <div class="transport-details">
+            <span><i class="fas fa-clock"></i> 当地火车站</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="route-section">
+      <h4><i class="fas fa-flag-checkered"></i> 目的地</h4>
+      <div class="transport-option">
+        <div class="transport-icon">
+          <i class="fas fa-landmark"></i>
+        </div>
+        <div class="transport-info">
+          <h5>故宫</h5>
+          <div class="transport-details">
+            <span><i class="fas fa-road"></i> 8.5公里</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="route-section">
+      <h4><i class="fas fa-bus"></i> 交通方式</h4>
+      <div class="transport-option active">
+        <div class="transport-icon" style="background-color: #34a853;">
+          <i class="fas fa-subway"></i>
+        </div>
+        <div class="transport-info">
+          <h5>地铁线路</h5>
+          <div class="transport-details">
+            <span><i class="fas fa-clock"></i> 约45分钟</span>
+            <span><i class="fas fa-wallet"></i> ￥5</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="transport-option">
+        <div class="transport-icon" style="background-color: #1a73e8;">
+          <i class="fas fa-bus"></i>
+        </div>
+        <div class="transport-info">
+          <h5>公交路线</h5>
+          <div class="transport-details">
+            <span><i class="fas fa-clock"></i> 约60分钟</span>
+            <span><i class="fas fa-wallet"></i> ￥2</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="transport-option">
+        <div class="transport-icon" style="background-color: #9c27b0;">
+          <i class="fas fa-taxi"></i>
+        </div>
+        <div class="transport-info">
+          <h5>出租车/网约车</h5>
+          <div class="transport-details">
+            <span><i class="fas fa-clock"></i> 约30分钟</span>
+            <span><i class="fas fa-wallet"></i> ￥35-45</span>
+          </div>
+        </div>
+      </div>
+      
+      <div class="transport-option">
+        <div class="transport-icon" style="background-color: #ff9800;">
+          <i class="fas fa-bicycle"></i>
+        </div>
+        <div class="transport-info">
+          <h5>自行车/步行</h5>
+          <div class="transport-details">
+            <span><i class="fas fa-clock"></i> 约90分钟</span>
+            <span><i class="fas fa-wallet"></i> 免费</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="route-action">
+      <button class="action-button primary">
+        <i class="fas fa-directions"></i> 开始导航
+      </button>
+      <button class="action-button secondary">
+        <i class="fas fa-times"></i> 关闭
+      </button>
+    </div>
+  </div>
+
+  <div id="weatherPanel">
+    <h3><i class="fas fa-cloud-sun"></i> <span id="weatherTitle">景区天气</span></h3>
+    <div id="weatherContent"></div>
+  </div>
+
+  <div class="status-indicator">
+    <div class="dot"></div>
+    <span>系统运行正常 · 已连接卫星图像服务</span>
+  </div>
+
+  <div class="operation-tip" id="operationTip"></div>
+
+  <script>
+    // 设置Cesium访问令牌
+    Cesium.Ion.defaultAccessToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJqdGkiOiJkNWNmMzViZi1hNjA4LTQ3MmMtOTQ1ZS1lOGM4YzkzMDZjMDYiLCJpZCI6MzA2NzI2LCJpYXQiOjE3NDgzNDgxNDB9.nZmuQzezuTQV15U1fHJyMRVMn1_ZtVSOmATa7sbQDyM';
+    
+    // 初始化图层索引
+    let currentImagery = 0;
+
+    // 定义图层列表和名称对应关系
+    const imageryProviders = [
+      {
+        name: "高德矢量",
+        provider: new Cesium.UrlTemplateImageryProvider({
+          url: 'http://webrd01.is.autonavi.com/appmaptile?&scale=1&lang=zh_cn&style=8&x={x}&y={y}&z={z}',
+          subdomains: ['1', '2', '3', '4'],
+          maximumLevel: 18
+        }),
+      },
+      {
+        name: "高德影像",
+        provider: new Cesium.UrlTemplateImageryProvider({
+          url: 'http://webst01.is.autonavi.com/appmaptile?style=6&x={x}&y={y}&z={z}',
+          subdomains: ['1', '2', '3', '4'],
+          maximumLevel: 18
+        }),
+      },
+      {
+        name: "高德路网",
+        provider: new Cesium.UrlTemplateImageryProvider({
+          url: 'http://webst01.is.autonavi.com/appmaptile?style=8&x={x}&y={y}&z={z}',
+          subdomains: ['1', '2', '3', '4'],
+          maximumLevel: 18
+        }),
+      },
+      {
+        name: "Cesium地形",
+        provider: new Cesium.UrlTemplateImageryProvider({
+          url: "https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}.png",
+          subdomains: ["a", "b", "c", "d"],
+          credit: "CartoDB"
+        }),
+      }
+    ];
+
+    // 创建Cesium Viewer
+    const viewer = new Cesium.Viewer("cesiumContainer", {
+      animation: false,
+      baseLayerPicker: false,
+      fullscreenButton: false,
+      vrButton: false,
+      geocoder: false,
+      homeButton: false,
+      infoBox: false,
+      sceneModePicker: false,
+      selectionIndicator: false,
+      timeline: false,
+      navigationHelpButton: false,
+      navigationInstructionsInitiallyVisible: false,
+      scene3DOnly: true,
+      terrainShadows: Cesium.ShadowMode.DISABLED,
+      skyAtmosphere: false
+    });
+
+    // 设置地形，影响观感，禁用
+    //Cesium.CesiumTerrainProvider.fromIonAssetId(1).then(function(terrainProvider) {
+      //viewer.terrainProvider = terrainProvider;
+    //});
+
+    // 添加OSM建筑,此功能默认禁用
+ //Cesium.createOsmBuildingsAsync().then(function(buildings) {
+   // viewer.scene.primitives.add(buildings);
+ // });
+// 切换图层函数
+    function switchImagery(index) {
+      // 移除所有影像图层
+      viewer.imageryLayers.removeAll();
+
+      // 获取当前图层配置
+      const selected = imageryProviders[index];
+
+      // 添加选中的影像图层
+      viewer.imageryLayers.addImageryProvider(selected.provider);
+
+      // 更新状态指示器
+      const status = document.querySelector('.status-indicator span');
+      status.textContent = `地图已切换至: ${selected.name}`;
+      
+      // 显示操作提示
+      const tip = document.getElementById('operationTip');
+      tip.textContent = `已切换到 ${selected.name} 地图`;
+      tip.style.display = "block";
+      setTimeout(() => { tip.style.display = "none"; }, 3000);
+    }
+    
+    
+
+    // 飞行到指定位置
+    function flyToLocation(name) {
+      const loc = locations[name];
+      if (!loc) return;
+      
+      viewer.camera.flyTo({
+        destination: Cesium.Cartesian3.fromDegrees(loc.lon, loc.lat, loc.height),
+        orientation: { heading: 0, pitch: Cesium.Math.toRadians(-30), roll: 0 },
+        duration: 3
+      });
+      
+      fetchWeather(name, loc.lon, loc.lat);
+      
+      // 更新状态指示器
+      const status = document.querySelector('.status-indicator span');
+      status.textContent = `正在导航至: ${name}`;
+      
+      // 关闭导航面板
+      document.getElementById("navPanel").style.display = "none";
+    }
+
+
+
+    // 切换导航面板
+    function toggleNavPanel() {
+      const navPanel = document.getElementById("navPanel");
+      const introducePanel = document.getElementById("introducePanel");
+      const imageryPanel = document.getElementById("imageryPanel");
+      const routePanel = document.getElementById("routePanel");
+      const toggleTicketPanel=document.getElementById("toggleTicketPanel");
+      
+      if (introducePanel.style.display === "flex") {
+        introducePanel.style.display = "none";
+      }
+      if (imageryPanel.style.display === "flex") {
+        imageryPanel.style.display = "none";
+      }
+      if (routePanel.style.display === "flex") {
+        routePanel.style.display = "none";
+      }
+      if (toggleTicketPanel.style.display === "flex") {
+        toggleTicketPanel.style.display = "none";
+      }
+      
+      navPanel.style.display = (navPanel.style.display === "none" || !navPanel.style.display) ? "flex" : "none";
+    }
+
+    // 切换介绍面板
+    function toggleIntroducePanel() {
+      const navPanel = document.getElementById("navPanel");
+      const introducePanel = document.getElementById("introducePanel");
+      const imageryPanel = document.getElementById("imageryPanel");
+      const routePanel = document.getElementById("routePanel");
+      const toggleTicketPanel=document.getElementById("toggleTicketPanel");
+      
+      if (navPanel.style.display === "flex") {
+        navPanel.style.display = "none";
+      }
+      if (imageryPanel.style.display === "flex") {
+        imageryPanel.style.display = "none";
+      }
+      if (routePanel.style.display === "flex") {
+        routePanel.style.display = "none";
+      }
+      if (toggleTicketPanel.style.display === "flex") {
+        toggleTicketPanel.style.display = "none";
+      }
+      
+      introducePanel.style.display = (introducePanel.style.display === "none" || !introducePanel.style.display) ? "flex" : "none";
+    }
+    // 切换买票面板
+    function toggleTicketPanel() {
+      const navPanel = document.getElementById("navPanel");
+      const introducePanel = document.getElementById("introducePanel");
+      const imageryPanel = document.getElementById("imageryPanel");
+      const routePanel = document.getElementById("routePanel");
+      const toggleTicketPanel=document.getElementById("toggleTicketPanel");
+      if (introducePanel.style.display === "flex") {
+        introducePanel.style.display = "none";
+      }
+      if (navPanel.style.display === "flex") {
+        navPanel.style.display = "none";
+      }
+      if (imageryPanel.style.display === "flex") {
+        imageryPanel.style.display = "none";
+      }
+      if (routePanel.style.display === "flex") {
+        routePanel.style.display = "none";
+      }
+
+      
+      toggleTicketPanel.style.display = (toggleTicketPanel.style.display === "none" || !toggleTicketPanel.style.display) ? "flex" : "none";
+    }
+
+    // 切换影像面板
+    function toggleImageryPanel() {
+      const navPanel = document.getElementById("navPanel");
+      const introducePanel = document.getElementById("introducePanel");
+      const imageryPanel = document.getElementById("imageryPanel");
+      const routePanel = document.getElementById("routePanel");
+      const toggleTicketPanel=document.getElementById("toggleTicketPanel");
+      
+      if (navPanel.style.display === "flex") {
+        navPanel.style.display = "none";
+      }
+      if (introducePanel.style.display === "flex") {
+        introducePanel.style.display = "none";
+      }
+      if (routePanel.style.display === "flex") {
+        routePanel.style.display = "none";
+      }
+      if (toggleTicketPanel.style.display === "flex") {
+        toggleTicketPanel.style.display = "none";
+      }
+      
+      imageryPanel.style.display = (imageryPanel.style.display === "none" || !imageryPanel.style.display) ? "flex" : "none";
+    }
+
+    // 切换路线规划面板
+    function toggleRoutePanel() {
+      const navPanel = document.getElementById("navPanel");
+      const introducePanel = document.getElementById("introducePanel");
+      const imageryPanel = document.getElementById("imageryPanel");
+      const routePanel = document.getElementById("routePanel");
+      const toggleTicketPanel=document.getElementById("toggleTicketPanel");
+      
+      if (navPanel.style.display === "flex") {
+        navPanel.style.display = "none";
+      }
+      if (introducePanel.style.display === "flex") {
+        introducePanel.style.display = "none";
+      }
+      if (imageryPanel.style.display === "flex") {
+        imageryPanel.style.display = "none";
+      }
+      if (toggleTicketPanel.style.display === "flex") {
+        toggleTicketPanel.style.display = "none";
+      }
+      
+      routePanel.style.display = (routePanel.style.display === "none" || !routePanel.style.display) ? "flex" : "none";
+    }
+
+   
+
+    // 路径分析变量
+    let pathHandler = null;
+    let currentPathPositions = [];
+    let pathFinished = false;
+    const pathColors = [
+      Cesium.Color.CYAN, Cesium.Color.ORANGE, Cesium.Color.LIME,
+      Cesium.Color.MAGENTA, Cesium.Color.RED, Cesium.Color.GREEN,
+      Cesium.Color.BLUE, Cesium.Color.YELLOW, Cesium.Color.PURPLE, Cesium.Color.PINK
+    ];
+    let pathColorIndex = 0;
+
+    // 启用路径分析
+function enablePathAnalysis() {
+  disablePathAnalysis();
+  currentPathPositions = [];
+  pathFinished = false;
+  const currentColor = pathColors[pathColorIndex % pathColors.length];
+  pathColorIndex++;
+
+  pathHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+
+  // 左键点击添加点
+  pathHandler.setInputAction(function (movement) {
+    if (pathFinished) return;
+    
+    const position = viewer.scene.pickPosition(movement.position);
+    if (Cesium.defined(position)) {
+      // 转为经纬度（Cartographic）后再重新生成位置，确保不会因视角变化而偏移
+      const cartographic = Cesium.Cartographic.fromCartesian(position);
+      const fixedPosition = Cesium.Cartesian3.fromRadians(
+        cartographic.longitude,
+        cartographic.latitude,
+        cartographic.height
+      );
+
+      currentPathPositions.push(fixedPosition);
+
+      viewer.entities.add({
+        position: fixedPosition,
+        point: {
+          pixelSize: 10,
+          color: Cesium.Color.ORANGE,
+          outlineColor: Cesium.Color.BLACK,
+          outlineWidth: 2
+        }
+      });
+
+      if (currentPathPositions.length > 1) {
+        viewer.entities.add({
+          polyline: {
+            positions: currentPathPositions.slice(),
+            width: 4,
+            material: currentColor,
+            clampToGround: false // 若想贴地可改为 true
+          }
+        });
+      }
+    }
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+  
+  // 右键点击结束路径计算
+  pathHandler.setInputAction(function () {
+    if (pathFinished || currentPathPositions.length < 2) {
+      alert("请至少选择两个点。");
+      return;
+    }
+
+    let totalDistance = 0;
+    for (let i = 1; i < currentPathPositions.length; i++) {
+      const c1 = Cesium.Cartographic.fromCartesian(currentPathPositions[i - 1]);
+      const c2 = Cesium.Cartographic.fromCartesian(currentPathPositions[i]);
+      const geodesic = new Cesium.EllipsoidGeodesic(c1, c2);
+      totalDistance += geodesic.surfaceDistance;
+    }
+
+    const distanceText = `总距离: ${(totalDistance / 1000).toFixed(3)} 公里`;
+    viewer.entities.add({
+      position: currentPathPositions[currentPathPositions.length - 1],
+      label: {
+        text: distanceText,
+        font: "16px sans-serif",
+        fillColor: Cesium.Color.YELLOW,
+        outlineColor: Cesium.Color.BLACK,
+        outlineWidth: 2,
+        style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+        verticalOrigin: Cesium.VerticalOrigin.BOTTOM,
+        pixelOffset: new Cesium.Cartesian2(0, -20)
+      }
+    });
+
+    pathFinished = true;
+
+    const status = document.querySelector('.status-indicator span');
+    status.textContent = `路径分析完成: ${distanceText}`;
+    
+    const tip = document.getElementById('operationTip');
+    tip.textContent = "路径分析完成！您可以继续分析下一条路径";
+    tip.style.display = "block";
+    setTimeout(() => { tip.style.display = "none"; }, 3000);
+  }, Cesium.ScreenSpaceEventType.RIGHT_CLICK);
+
+  // 操作提示
+  const tip = document.getElementById('operationTip');
+  tip.textContent = "路径分析已启用：左键添加点，右键结束并显示距离";
+  tip.style.display = "block";
+  setTimeout(() => { tip.style.display = "none"; }, 5000);
+}
+
+
+    // 禁用路径分析
+    function disablePathAnalysis() {
+      if (pathHandler) {
+        pathHandler.destroy();
+        pathHandler = null;
+      }
+    }
+
+    // 添加自定义标注功能
+    let handler; // 全局点击处理器
+    
+    function startCustomAnnotation() {
+      if (handler) {
+        handler.destroy();
+      }
+      
+      handler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      
+      // 显示操作提示
+      const tip = document.getElementById('operationTip');
+      tip.textContent = "点击地图添加标注，按 ESC 键退出标注模式";
+      tip.style.display = "block";
+      setTimeout(() => { tip.style.display = "none"; }, 5000);
+      
+      // 左键点击添加标注
+      handler.setInputAction(function (click) {
+        const earthPosition = viewer.scene.pickPosition(click.position);
+        if (Cesium.defined(earthPosition)) {
+          const cartographic = Cesium.Cartographic.fromCartesian(earthPosition);
+          const lon = Cesium.Math.toDegrees(cartographic.longitude).toFixed(6);
+          const lat = Cesium.Math.toDegrees(cartographic.latitude).toFixed(6);
+          
+          const name = prompt(`请输入标注名称 (${lon}, ${lat})：`, "新标注");
+          if (name) {
+            viewer.entities.add({
+              position: earthPosition,
+              point: {
+                pixelSize: 10,
+                color: Cesium.Color.RED,
+              },
+              label: {
+                text: name,
+                font: "16px 宋体, SimSun, serif",
+                fillColor: Cesium.Color.BLACK,
+                style: Cesium.LabelStyle.FILL_AND_OUTLINE,
+                outlineWidth: 2,
+                verticalOrigin: Cesium.VerticalOrigin.TOP,
+                pixelOffset: new Cesium.Cartesian2(0, -20)
+              }
+            });
+            
+            // 更新状态指示器
+            const status = document.querySelector('.status-indicator span');
+            status.textContent = `已添加标注: ${name}`;
+          }
+        }
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+
+      // ESC 键退出标注模式
+      window.addEventListener("keydown", function (e) {
+        if (e.key === "Escape") {
+          if (handler) {
+            handler.destroy();
+            handler = null;
+            
+            // 显示操作提示
+            const tip = document.getElementById('operationTip');
+            tip.textContent = "已退出标注模式";
+            tip.style.display = "block";
+            setTimeout(() => { tip.style.display = "none"; }, 3000);
+          }
+        }
+      });
+    }
+
+    // 显示路线规划
+    function showRoutePlanning(name) {
+      const data = routeData[name];
+      if (!data) return;
+      
+      const routePanel = document.getElementById("routePanel");
+      const destinationSection = routePanel.querySelector('.route-section:nth-child(2)');
+      
+      // 更新目的地信息
+      destinationSection.querySelector('h5').textContent = name;
+      destinationSection.querySelector('.transport-details span').textContent = data.distance;
+      
+      // 更新交通方式
+      const transportSection = routePanel.querySelector('.route-section:nth-child(3)');
+      transportSection.innerHTML = `
+        <h4><i class="fas fa-bus"></i> 交通方式</h4>
+        ${data.transport.map((t, i) => `
+          <div class="transport-option ${i === 0 ? 'active' : ''}">
+            <div class="transport-icon" style="background-color: ${t.color}">
+              <i class="${t.icon}"></i>
+            </div>
+            <div class="transport-info">
+              <h5>${t.type}</h5>
+              <div class="transport-details">
+                <span><i class="fas fa-clock"></i> ${t.time}</span>
+                <span><i class="fas fa-wallet"></i> ${t.price}</span>
+              </div>
+            </div>
+          </div>
+        `).join('')}
+      `;
+      
+      // 添加交通方式选择事件
+      const transportOptions = transportSection.querySelectorAll('.transport-option');
+      transportOptions.forEach(option => {
+        option.addEventListener('click', function() {
+          transportOptions.forEach(opt => opt.classList.remove('active'));
+          this.classList.add('active');
+        });
+      });
+      
+      // 显示路线面板
+      toggleRoutePanel();
+    }
+
+    // 绑定按钮事件
+    document.getElementById('switchImageryBtn').addEventListener('click', toggleImageryPanel);
+    document.getElementById('quickJumpBtn').addEventListener('click', toggleNavPanel);
+    document.getElementById('introduceBtn').addEventListener('click', toggleIntroducePanel);
+    document.getElementById('ticketBtn').addEventListener('click', toggleTicketPanel);
+    document.getElementById('pathAnalysisBtn').addEventListener('click', enablePathAnalysis);
+    document.getElementById('routePlanningBtn').addEventListener('click', toggleRoutePanel);
+    document.getElementById('addLabelBtn').addEventListener('click', startCustomAnnotation);
+    document.getElementById('clearBtn').addEventListener('click', clearAllEntities);
+
+    // 绑定影像按钮事件
+    const imageryButtons = document.querySelectorAll('#imageryPanel .navButton');
+    imageryButtons.forEach(btn => {
+      btn.addEventListener('click', function() {
+        const index = parseInt(this.getAttribute('data-imagery'));
+        switchImagery(index);
+        document.getElementById('imageryPanel').style.display = 'none';
+      });
+    });
+
+    // 绑定导航按钮事件
+    const navButtons = document.querySelectorAll('#navPanel .navButton');
+    navButtons.forEach((btn, index) => {
+      const locations = ['故宫', '西湖', '九寨沟', '东方明珠', '布达拉宫'];
+      btn.addEventListener('click', () => flyToLocation(locations[index]));
+    });
+
+    // 绑定介绍按钮事件
+    const introButtons = document.querySelectorAll('#introducePanel .navButton');
+    introButtons.forEach((btn, index) => {
+      const locations = ['故宫', '西湖', '九寨沟', '东方明珠', '布达拉宫'];
+      btn.addEventListener('click', () => openIntroducePage(locations[index]));
+    });
+    // 绑定介绍按钮事件
+    const ticketButtons = document.querySelectorAll('#toggleTicketPanel .navButton');
+    ticketButtons.forEach((btn, index) => {
+      const locations = ['故宫', '西湖', '九寨沟', '东方明珠', '布达拉宫'];
+      btn.addEventListener('click', () => openTicketPage(locations[index]));
+    });
+
+    // 绑定路线规划按钮事件
+    navButtons.forEach((btn, index) => {
+      const locations = ['故宫', '西湖', '九寨沟', '东方明珠', '布达拉宫'];
+      btn.addEventListener('click', () => {
+        if (routeData[locations[index]]) {
+          showRoutePlanning(locations[index]);
+        } else {
+          const tip = document.getElementById('operationTip');
+          tip.textContent = "该景点路线规划信息正在建设中";// 一般来说应该也看不到这个
+          tip.style.display = "block";
+          setTimeout(() => { tip.style.display = "none"; }, 3000);
+        }
+      });
+    });
+
+    // 绑定路线面板关闭按钮
+    document.querySelector('.action-button.secondary').addEventListener('click', toggleRoutePanel);
+
+    // 页面加载时初始化地图
+    window.addEventListener('load', function() {
+      // 设置初始位置为故宫
+      flyToLocation('故宫');
+      
+      // 设置初始地图影像
+      switchImagery(0);
+    });
+  </script>
+</body>
+</html>
