@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallel Projection</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 20px auto;
+            background-color: #fff;
+            border: 1px solid #000;
+        }
+        button {
+            display: block;
+            margin: 10px auto;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <button onclick="onZhengtouying()">正投影</button>
+    <button onclick="onZhengdengce()">正等测</button>
+    <button onclick="onZhengerce()">正二测</button>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const N = 12;
+
+        const lifang = [
+            [0, 0.5, 1, 1], [1, 0.5, 1, 1], [1, 1, 1, 1], [0, 1, 1, 1],
+            [0, 0, 0, 1], [1, 0, 0, 1], [1, 1, 0, 1], [0, 1, 0, 1],
+            [0, 0, 2, 1], [1, 0, 2, 1], [1, 0.5, 2, 1], [0, 0.5, 2, 1]
+        ];
+        let jieguo = JSON.parse(JSON.stringify(lifang));
+
+        function matx_N4(a, b, c) {
+            for (let m = 0; m < N; m++)
+                for (let i = 0; i < 4; i++)
+                    c[m][i] = 0;
+            for (let m = 0; m < N; m++)
+                for (let i = 0; i < 4; i++)
+                    for (let j = 0; j < 4; j++)
+                        c[m][i] += a[m][j] * b[j][i];
+            for (let i = 0; i < N; i++)
+                for (let j = 0; j < 4; j++)
+                    c[i][j] /= c[i][3];
+        }
+
+        function mydraw() {
+            const tx = Array(N).fill().map(() => Array(2));
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let i = 0; i < N; i++) {
+                tx[i][0] = jieguo[i][0] * 100 + 300;
+                tx[i][1] = 200 - jieguo[i][1] * 100;
+            }
+
+            function drawLine(from, to) {
+                ctx.beginPath();
+                ctx.moveTo(tx[from][0], tx[from][1]);
+                ctx.lineTo(tx[to][0], tx[to][1]);
+                ctx.stroke();
+            }
+
+            drawLine(0, 1); drawLine(1, 2); drawLine(2, 3); drawLine(3, 0);
+            drawLine(4, 5); drawLine(5, 6); drawLine(6, 7); drawLine(7, 4);
+            drawLine(0, 4); drawLine(1, 5); drawLine(2, 6); drawLine(3, 7);
+            drawLine(8, 9); drawLine(9, 10); drawLine(10, 11); drawLine(11, 8);
+            drawLine(8, 4); drawLine(9, 5); drawLine(10, 6); drawLine(11, 7);
+        }
+
+        function onZhengtouying() {
+            const bianhuan2 = [
+                [1, 0, 0, 0], [0, 1, 0, 0], [0, 0, 0, 0], [0, 0, 0, 1]
+            ];
+            matx_N4(lifang, bianhuan2, jieguo);
+            mydraw();
+        }
+
+        function onZhengdengce() {
+            const zhouce = [
+                [0.7071, 0.4082, 0, 0], [0, 0.8166, 0, 0], [0.7071, -0.4082, 0, 0], [0, 0, 0, 1]
+            ];
+            matx_N4(lifang, zhouce, jieguo);
+            mydraw();
+        }
+
+        function onZhengerce() {
+            const zhouce = [
+                [0.9258, 0.1336, 0, 0], [0, 0.9534, 0, 0], [0.3780, -0.3273, 0, 0], [0, 0, 0, 1]
+            ];
+            matx_N4(lifang, zhouce, jieguo);
+            mydraw();
+        }
+
+        window.onload = onZhengtouying;
+    </script>
+</body>
+</html>

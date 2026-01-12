@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bresenham Ellipse Algorithm</title>
+  <style>
+    #canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="400"></canvas>
+
+  <script>
+    function drawEllipse(x0, y0, a, b) {
+      let canvas = document.getElementById('canvas');
+      let ctx = canvas.getContext('2d');
+  
+      let x = 0;
+      let y = b;
+      let a2 = a * a;
+      let b2 = b * b;
+      let d = b2 - a2 * b + 0.25 * a2;
+      let deltaE = 3 * b2;
+      let deltaSE = 3 * (b2 - a2 * b + 0.25 * a2);
+  
+      while (a2 * (y - 0.5) > b2 * (x + 1)) {
+        if (d < 0) {
+          d += deltaE;
+          deltaE += 2 * b2;
+          deltaSE += 2 * b2;
+        } else {
+          d += deltaSE;
+          deltaE += 2 * b2;
+          deltaSE += 2 * (b2 - a2);
+          y--;
+        }
+        x++;
+        plotPoints(x0, y0, x, y);
+      }
+  
+      d = b2 * (x + 0.5) * (x + 0.5) + a2 * (y - 1) * (y - 1) - a2 * b2;
+      deltaSE = 3 * a2 * (y - 1);
+  
+      while (y > 0) {
+        if (d < 0) {
+          d += deltaSE;
+          deltaSE += 2 * a2;
+        } else {
+          d += deltaSE - 2 * a2 * (x + 1);
+          deltaSE += 2 * a2;
+          x++;
+        }
+        y--;
+        plotPoints(x0, y0, x, y);
+      }
+    }
+  
+    function plotPoints(x0, y0, x, y) {
+      let canvas = document.getElementById('canvas');
+      let ctx = canvas.getContext('2d');
+  
+      // 在(x0, y0)周围绘制对称的点
+      ctx.fillRect(x0 + x, y0 + y, 1, 1);
+      ctx.fillRect(x0 - x, y0 + y, 1, 1);
+      ctx.fillRect(x0 + x, y0 - y, 1, 1);
+      ctx.fillRect(x0 - x, y0 - y, 1, 1);
+    }
+  
+    // 在这里调用drawEllipse函数，并传入合适的参数
+    drawEllipse(400, 200, 100, 50);
+  </script>
+</body>
+</html>

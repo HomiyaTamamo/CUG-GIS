@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wu反走样算法</title>
+    <style>
+        canvas {
+            border: 1px solid #000000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <script>
+        function drawPixel(ctx, x, y, color) {
+            ctx.fillStyle = color;
+            ctx.fillRect(x, y, 1, 1);
+        }
+
+        function drawLine(ctx, x0, y0, x1, y1, color, useWu) {
+            if (useWu) {
+                let dx = Math.abs(x1 - x0);
+                let dy = Math.abs(y1 - y0);
+                let steep = dy > dx;
+
+                if (steep) {
+                    [x0, y0] = [y0, x0];
+                    [x1, y1] = [y1, x1];
+                }
+
+                if (x0 > x1) {
+                    [x0, x1] = [x1, x0];
+                    [y0, y1] = [y1, y0];
+                }
+
+                dx = x1 - x0;
+                dy = y1 - y0;
+                let gradient = dy / dx;
+
+                let y = y0 + gradient;
+                for (let x = x0 + 1; x < x1; x++) {
+                    if (steep) {
+                        drawPixel(ctx, y, x, color);
+                    } else {
+                        drawPixel(ctx, x, y, color);
+                    }
+                    y += gradient;
+                }
+            } else {
+                ctx.strokeStyle = color;
+                ctx.beginPath();
+                ctx.moveTo(x0, y0);
+                ctx.lineTo(x1, y1);
+                ctx.stroke();
+            }
+        }
+
+        window.onload = function() {
+            let canvas = document.getElementById("myCanvas");
+            let ctx = canvas.getContext("2d");
+
+            // 绘制使用Wu反走样算法的线条
+            drawLine(ctx, 50, 50, 450, 450, "black", true);
+
+            // 绘制不使用Wu反走样算法的红色线条
+            drawLine(ctx, 50, 100, 450, 500, "red", false);
+        };
+    </script>
+</body>
+</html>

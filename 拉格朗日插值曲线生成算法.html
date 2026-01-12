@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html>
+<head>
+<style>
+  canvas {
+    border: 1px solid black;
+  }
+</style>
+</head>
+<body>
+
+<canvas id="myCanvas" width="500" height="500"></canvas>
+
+<script>
+  const canvas = document.getElementById('myCanvas');
+  const ctx = canvas.getContext('2d');
+
+  function lagrangeInterpolation(x, y, xValue) {
+    let result = 0;
+    for (let i = 0; i < x.length; i++) {
+      let term = y[i];
+      for (let j = 0; j < x.length; j++) {
+        if (i !== j) {
+          term *= (xValue - x[j]) / (x[i] - x[j]);
+        }
+      }
+      result += term;
+    }
+    return result;
+  }
+
+  const x = [50, 100, 150, 200];
+  const y = [30, 60, 90, 120];
+
+  for (let i = 0; i < canvas.width; i++) {
+    const xValue = i / canvas.width * 3;
+    const yValue = lagrangeInterpolation(x, y, xValue);
+    ctx.fillRect(i, canvas.height - yValue * canvas.height, 1, 1);
+  }
+</script>
+
+</body>
+</html>
