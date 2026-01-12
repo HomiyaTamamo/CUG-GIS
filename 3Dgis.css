@@ -1,0 +1,114 @@
+        #toolbar { 
+            position: absolute; 
+            top: 10px; 
+            left: 10px; 
+            z-index: 1000; 
+            background: rgba(255,255,255,0.9); 
+            padding: 10px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+        button { 
+            margin: 5px;
+            padding: 8px 12px;
+            background: #686c68;
+            color: white;
+            border: none;
+            border-radius: 3px;
+            cursor: pointer;
+        }
+        button:hover {
+            background: #686c68;
+        }
+        #coordinates {
+            position: absolute;
+            top: 100px;
+            left: 20px;
+            background: rgba(255,255,255,0.9);
+            padding: 15px;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            min-width: 250px;
+            z-index: 1000;}
+            #coordinates2 {
+    position: absolute;
+    right: 200px;       
+    bottom: 200px;      
+    background: rgba(255,255,255,0.9);
+    padding: 15px;
+    border-radius: 5px;
+    font-family: 'Courier New', monospace;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+    min-width: 250px;
+    z-index: 1000;}
+/* 天气弹窗样式 */
+        #weatherPanel {
+            display: none;
+            position: fixed;
+            top: 20%;
+            left: 50%;
+            transform: translate(-50%, -20%);
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+            z-index: 1000;
+            width: 320px;
+        }
+        
+        #weatherTitle {
+            font-size: 20px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 10px;
+            text-align: center;
+        }
+        
+        #weatherContent {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .weatherDay {
+            display: flex;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid #f5f5f5;
+        }
+        
+        .weatherDay:last-child {
+            border-bottom: none;
+        }
+        
+        .day-name {
+            width: 80px;
+            font-weight: bold;
+        }
+        
+        .weatherDay img {
+            width: 40px;
+            height: 40px;
+            margin: 0 15px;
+        }
+        
+        .weatherInfo {
+            flex: 1;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background: none;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-btn:hover {
+            color: #333;
+        }

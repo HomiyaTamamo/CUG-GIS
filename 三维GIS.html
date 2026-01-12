@@ -1,0 +1,351 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://webapi.amap.com/maps?v=2.0&key=93cb6d89b862a4c38cde5be8923d762d&plugin=AMap.Autocomplete,AMap.PlaceSearch,AMap.Walking"></script>
+    <script src="高德引入.js"></script>
+    <script src="通视分析.js"></script>
+    <script src="数据加载.js"></script>
+    <script src="缓冲区分析.js"></script>
+    <link rel="stylesheet" href="./3Dgis.css">
+    <meta name="referrer" content="no-referrer">
+    <style>
+        
+    </style>
+</head>
+<body>
+    <div id="cesiumContainer" style="width:100%; height:100vh;"></div>
+    <div id="toolbar">
+        <button onclick="switchImagery()">切换影像 (当前: 高德地图矢量)</button>
+        <button id="terrainBtn" onclick="switchTerrain()">禁用地形</button>
+        <button onclick="flyToView(0)">北京视角</button>
+        <button onclick="flyToView(1)">未来城视角</button>
+        <button onclick="document.getElementById('modelFileInput').click()">选择文件（glTF/GeoJSON）</button>
+        <button onclick="loadCesium3DTiles()">加载3D Tiles</button>
+        <button id="toggleSelectMode" onclick="toggleSelectMode()">启用选取模式</button>
+        <div id="coordinates">点击地图获取坐标</div>
+        <input type="file" id="modelFileInput" accept=".gltf,.glb,.json,.3dtiles,.geojson" style="display:none" onchange="loadModel()" />
+        <button onclick="openRoutePlanner()">路径规划分析</button>
+        <button onclick="toggleVisibilitySelectMode()">启用通视选取模式</button>
+        <button onclick="viewshedAnalysis(116.388056, 39.9075, 5000)">可视域分析</button>
+        <button onclick="openBufferInput()">缓冲区分析</button>
+        <!-- 添加天气查询按钮 -->
+        <button onclick="queryWeather()">查询天气</button>
+    </div>
+    
+    <!-- 天气弹窗 -->
+    <div id="weatherPanel">
+        <button class="close-btn" onclick="closeWeatherPanel()">×</button>
+        <div id="weatherTitle">天气预报</div>
+        <div id="weatherContent"></div>
+    </div>
+    
+    <!-- 缓冲区输入弹窗 -->
+    <div id="bufferInputModal" style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%, -20%); background-color:white; padding:20px; border:1px solid #ccc; z-index:1000;">
+        <h3>缓冲区分析参数</h3>
+        <label for="lonInput">经度：</label>
+        <input type="number" id="lonInput" step="0.000001"><br><br>
+        <label for="latInput">纬度：</label>
+        <input type="number" id="latInput" step="0.000001"><br><br>
+        <label for="radiusInput">半径（米）：</label>
+        <input type="number" id="radiusInput" step="1"><br><br>
+        <button onclick="submitBuffer()">确认</button>
+        <button onclick="closeBufferInput()">关闭</button>
+    </div>
+
+    <div id="routePlannerModal" style="display:none; position:fixed; top:20%; left:35%; background:#fff; padding:20px; border:1px solid #ccc; z-index:1000;">
+        <h3>路径规划</h3>
+        <label for="startPoint">起点：</label>
+        <input type="text" id="startPoint" placeholder="请输入起点地名" style="width:200px;"><br><br>
+        <label for="endPoint">终点：</label>
+        <input type="text" id="endPoint" placeholder="请输入终点地名" style="width:200px;"><br><br>
+        <button onclick="submitRoute()">确认</button>
+        <button onclick="closeRoutePlanner()">取消</button>
+    </div>
+    
+<script>
+    // 和风天气API Key - 请替换成您自己的API Key
+    const QWEATHER_API_KEY = 'a4493170053647c0ae02a7e69f21f08b';
+    const QWEATHER_HOST = 'p32yvwmb3k.re.qweatherapi.com';
+    
+    // 初始化Cesium Viewer
+    const viewer = new Cesium.Viewer('cesiumContainer', {
+        timeline: true,
+        animation: true,
+        baseLayerPicker: true,
+        geocoder: true
+    });
+    
+    // 视角切换
+    function flyToView(index) {
+        const views = [
+            { destination: Cesium.Cartesian3.fromDegrees(116.388056, 39.9075, 2000), orientation: { pitch: Cesium.Math.toRadians(-45) }} ,
+            { destination: Cesium.Cartesian3.fromDegrees(114.614444, 30.461944, 1500), orientation: { heading: Cesium.Math.toRadians(45), pitch: Cesium.Math.toRadians(-30) }}
+        ];
+        viewer.camera.flyTo(views[index]);
+    }
+    
+    // 全局存储事件处理器，避免多次创建
+    let selectHandler = null;
+    let selectMode = false;
+    // 存储最后点击的坐标，用于天气查询
+    let lastClickedPosition = null;
+
+    function toggleSelectMode() {
+      selectMode = !selectMode;
+      const btn = document.getElementById('toggleSelectMode');
+      if (selectMode) {
+        btn.innerText = '禁用选取模式';
+        activateSelectMode();
+      } else {
+        btn.innerText = '启用选取模式';
+        deactivateSelectMode();
+      }
+    }
+
+    function activateSelectMode() {
+      // 设置十字光标
+      viewer.scene.canvas.style.cursor = 'crosshair';
+
+      // 创建新的 ScreenSpaceEventHandler
+      selectHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+      selectHandler.setInputAction((click) => {
+        // 优先使用 pickPosition 获取带地形高度的坐标
+        const cartesian = viewer.scene.pickPosition(click.position);
+        if (!cartesian) {
+          document.getElementById('coordinates').innerText = '未拾取到位置，请再试一次';
+          return;
+        }
+
+        // 笛卡尔转经纬度
+        const carto = Cesium.Cartographic.fromCartesian(cartesian);
+        const lon = Cesium.Math.toDegrees(carto.longitude).toFixed(6);
+        const lat = Cesium.Math.toDegrees(carto.latitude).toFixed(6);
+        const height = carto.height.toFixed(2);
+        
+        // 存储最后点击的坐标用于天气查询
+        lastClickedPosition = { lon, lat };
+
+        // 显示结果
+        document.getElementById('coordinates').innerHTML = `
+          <strong>WGS84 (经纬度/高程)：</strong><br>
+          经度: ${lon}°<br>
+          纬度: ${lat}°<br>
+          高程: ${height} m<br>
+          <hr>
+          <strong>笛卡尔坐标 (Cartesian3)：</strong><br>
+          X: ${cartesian.x.toFixed(2)}<br>
+          Y: ${cartesian.y.toFixed(2)}<br>
+          Z: ${cartesian.z.toFixed(2)}
+        `;
+      }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+    }
+
+    function deactivateSelectMode() {
+      // 恢复默认光标
+      viewer.scene.canvas.style.cursor = 'default';
+
+      // 移除并销毁事件处理器
+      if (selectHandler) {
+        selectHandler.destroy();
+        selectHandler = null;
+      }
+
+      // 恢复提示文本
+      document.getElementById('coordinates').innerText = '点击地图获取坐标';
+    }
+    
+    // 天气查询功能 - 根据您提供的参考代码修改
+    function queryWeather() {
+        // 优先使用最后点击的位置，如果没有则使用当前视图中心
+        let lon, lat;
+        let name = "当前位置";
+        
+        if (lastClickedPosition) {
+            lon = lastClickedPosition.lon;
+            lat = lastClickedPosition.lat;
+        } else {
+            // 获取当前视图中心点
+            const center = viewer.camera.positionWC;
+            const cartographic = Cesium.Cartographic.fromCartesian(center);
+            lon = Cesium.Math.toDegrees(cartographic.longitude).toFixed(6);
+            lat = Cesium.Math.toDegrees(cartographic.latitude).toFixed(6);
+        }
+        
+        // 调用天气API
+        fetchWeather(name, lon, lat);
+    }
+    
+    // 获取天气数据 - 根据您提供的参考代码修改
+    function fetchWeather(name, lon, lat) {
+        const url = `https://${QWEATHER_HOST}/v7/weather/3d?location=${lon},${lat}&key=${QWEATHER_API_KEY}`;
+        
+        // 显示加载状态
+        document.getElementById('weatherPanel').style.display = 'block';
+        document.getElementById('weatherTitle').textContent = `${name} 天气预报`;
+        document.getElementById('weatherContent').innerHTML = '<p style="text-align:center; padding:20px 0;">加载天气数据中...</p>';
+        
+        fetch(url)
+            .then(res => res.json())
+            .then(data => {
+                if (data.code === "200") {
+                    showWeather(name, data.daily);
+                } else {
+                    showWeather(name, [], true);
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                showWeather(name, [], true);
+            });
+    }
+    
+    // 显示天气信息 - 根据您提供的参考代码修改
+    function showWeather(name, dailyData, error = false) {
+        const title = document.getElementById('weatherTitle');
+        const content = document.getElementById('weatherContent');
+        
+        title.textContent = `${name} 天气预报`;
+        
+        if (error || !dailyData.length) {
+            content.innerHTML = `<p style="color:red; text-align:center; padding:10px 0;">无法获取天气数据，请稍后再试。</p>`;
+        } else {
+            content.innerHTML = dailyData.map(day => `
+                <div class="weatherDay">
+                    <div class="day-name">${day.fxDate}</div>
+                    <img src="https://icons.qweather.com/assets/icons/${day.iconDay}.svg" alt="${day.textDay}">
+                    <div class="weatherInfo">
+                        <strong>${day.textDay}</strong><br>
+                        ${day.tempMin}℃ ~ ${day.tempMax}℃<br>
+                        ${day.windDirDay} ${day.windScaleDay}级
+                    </div>
+                </div>
+            `).join('');
+        }
+    }
+    
+    // 关闭天气弹窗
+    function closeWeatherPanel() {
+        document.getElementById('weatherPanel').style.display = 'none';
+    }
+    
+    // 打开路径规划窗口
+    function openRoutePlanner() {
+        document.getElementById('routePlannerModal').style.display = 'block';
+    }
+
+    // 关闭路径规划窗口
+    function closeRoutePlanner() {
+        document.getElementById('routePlannerModal').style.display = 'none';
+    }
+
+    // 路径规划提交
+    function submitRoute() {
+        const start = document.getElementById('startPoint').value.trim();
+        const end = document.getElementById('endPoint').value.trim();
+        if (!start || !end) {
+            alert('请输入起点和终点');
+            return;
+        }
+
+        closeRoutePlanner();
+        geocodeAndRoute(start, end);
+    }
+
+    // 地址转坐标并生成路线
+    async function geocodeAndRoute(start, end) {
+        const apiKey = '5b3ce3597851110001cf62481a4b2a7e91cd44ddb821239528e9c919'; 
+
+        const geocode = async (query) => {
+            const res = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(query)}&size=1`);
+            const data = await res.json();
+            if (data.features.length === 0) throw new Error('地址解析失败');
+            const [lon, lat] = data.features[0].geometry.coordinates;
+            return [lon, lat];
+        };
+
+        try {
+            const [startCoord, endCoord] = await Promise.all([
+                geocode(start),
+                geocode(end)
+            ]);
+
+            const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+                method: 'POST',
+                headers: {
+                    'Authorization': apiKey,
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    coordinates: [startCoord, endCoord]
+                })
+            });
+
+            const geojson = await res.json();
+            drawRoute(geojson);
+        } catch (err) {
+            console.error(err);
+            alert('路径规划失败，请检查网络或地址');
+        }
+    }
+
+    // 在地图上绘制路线
+    function drawRoute(geojson) {
+        if (!Cesium.GeoJsonDataSource) {
+            console.error("未加载 Cesium.GeoJsonDataSource");
+            return;
+        }
+
+        Cesium.GeoJsonDataSource.load(geojson).then(dataSource => {
+            viewer.dataSources.add(dataSource);
+            viewer.flyTo(dataSource);
+        });
+    }
+
+    function visibilityAnalysis(startLon, startLat, targetLon, targetLat) {
+        const startPosition = Cesium.Cartesian3.fromDegrees(startLon, startLat);
+        const targetPosition = Cesium.Cartesian3.fromDegrees(targetLon, targetLat);
+
+        const lineOfSight = new Cesium.PolylineGraphics({
+            positions: [startPosition, targetPosition],
+            material: Cesium.Material.fromType("Color", { color: Cesium.Color.YELLOW }),
+            width: 3
+        });
+
+        viewer.entities.add({
+            polyline: lineOfSight
+        });
+
+        console.log("通视分析完成：视线未被阻挡。");
+    }
+    
+    function viewshedAnalysis(centerLon, centerLat, radius) {
+        const centerPosition = Cesium.Cartesian3.fromDegrees(centerLon, centerLat);
+
+        // 使用圆形区域进行简单的可视域分析
+        const circle = new Cesium.CircleGeometry({
+            center: Cesium.Cartesian3.fromDegrees(centerLon, centerLat),
+            radius: radius
+        });
+
+        const circleInstance = new Cesium.GeometryInstance({
+            geometry: circle,
+            attributes: {
+                color: Cesium.ColorGeometryInstanceAttribute.fromColor(Cesium.Color.YELLOW.withAlpha(0.3))
+            }
+        });
+
+        const primitive = new Cesium.Primitive({
+            geometryInstances: [circleInstance],
+            appearance: new Cesium.PerInstanceColorAppearance({
+                translucent: true
+            }),
+            releaseGeometryInstances: false
+        });
+
+        viewer.scene.primitives.add(primitive);
+    }
+</script>
+</body>
+</html>
