@@ -1,0 +1,489 @@
+:root {
+      --primary-color: #1a73e8;
+      --primary-dark: #1557b0;
+      --accent-color: #34a853;
+      --accent-light: #e8f5e9;
+      --text-dark: #202124;
+      --text-light: #5f6368;
+      --card-bg: rgba(255, 255, 255, 0.95);
+      --shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      --border-radius: 12px;
+      --transition: all 0.3s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
+    }
+
+    html, body, #cesiumContainer {
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      background: linear-gradient(135deg, #e0f7fa 0%, #f5f5f5 100%);
+    }
+
+    /* 标题样式 */
+    #centerTitle {
+      position: absolute;
+      top: 30px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5rem;
+      font-weight: 700;
+      color: var(--primary-dark);
+      text-shadow: 0 2px 8px rgba(255, 255, 255, 0.7);
+      z-index: 10;
+      pointer-events: none;
+      padding: 0.8rem 2rem;
+      background: rgba(255, 255, 255, 0.85);
+      border-radius: 50px;
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    /* 侧边按钮样式 */
+    .sideButton {
+      position: absolute;
+      left: 20px;
+      width: 160px;
+      padding: 12px 20px;
+      font-size: 16px;
+      font-weight: 600;
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+      border: none;
+      border-radius: var(--border-radius);
+      cursor: pointer;
+      box-shadow: var(--shadow);
+      z-index: 20;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 10px;
+      user-select: none;
+    }
+
+    .sideButton i {
+      font-size: 18px;
+    }
+
+    .sideButton:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, var(--primary-dark), #114a9e);
+    }
+
+    .sideButton:active {
+      transform: translateY(1px);
+    }
+
+    #switchImageryBtn {
+      top: 50px;
+    }
+
+    #quickJumpBtn {
+      top: 110px;
+    }
+
+    #introduceBtn {
+      top: 170px;
+    }
+    #ticketBtn{
+      top: 230px;
+    }
+    #pathAnalysisBtn {
+      top: 290px;
+    }
+
+    #routePlanningBtn {
+      top: 350px;
+    }
+
+    #addLabelBtn {
+      top: 410px;
+    }
+
+    #clearBtn {
+      top: 470px;
+    }
+
+    /* 面板样式 */
+    .panel {
+      position: absolute;
+      display: flex;
+      gap: 10px;
+      background: var(--card-bg);
+      padding: 12px 16px;
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      z-index: 20;
+      display: none;
+      animation: fadeIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+      transition: var(--transition);
+    }
+
+    #imageryPanel {
+      top: 50px;
+      left: 200px;
+    }
+
+    #navPanel {
+      top: 110px;
+      left: 200px;
+    }
+
+    #introducePanel {
+      top: 170px;
+      left: 200px;
+    }
+    #toggleTicketPanel {
+      top: 230px;
+      left: 200px;
+    }
+
+    #routePanel {
+      top: 110px;
+      left: 200px;
+      flex-direction: column;
+      width: 350px;
+    }
+
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(-10px) scale(0.95); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .navButton {
+      flex-shrink: 0;
+      height: 48px;
+      padding: 0 18px;
+      font-size: 16px;
+      font-weight: 600;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      user-select: none;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      gap: 8px;
+    }
+
+    .navButton.primary {
+      background: linear-gradient(135deg, var(--accent-color), #2e8b47);
+    }
+    
+    .navButton.primary:hover {
+      background: linear-gradient(135deg, #2e8b47, #267a3d);
+    }
+    
+    .navButton.secondary {
+      background: linear-gradient(135deg, #9c27b0, #673ab7);
+    }
+    
+    .navButton.secondary:hover {
+      background: linear-gradient(135deg, #8e24aa, #5e35b1);
+    }
+    
+    .navButton.tertiary {
+      background: linear-gradient(135deg, #ff9800, #ff5722);
+    }
+    
+    .navButton.tertiary:hover {
+      background: linear-gradient(135deg, #f57c00, #f4511e);
+    }
+    
+    .navButton.quaternary {
+      background: linear-gradient(135deg, #00bcd4, #0097a7);
+    }
+    
+    .navButton.quaternary:hover {
+      background: linear-gradient(135deg, #00acc1, #00838f);
+    }
+    .navButton.fifth {
+      background: linear-gradient(135deg, #349c26, #0a5621);
+    }
+    
+    .navButton.fifth:hover {
+      background: linear-gradient(135deg, #349c22, #0a5617);
+    }
+
+    /* 路线规划面板 */
+    .route-section {
+      margin-bottom: 15px;
+      padding-bottom: 15px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    .route-section:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border: none;
+    }
+
+    .route-section h4 {
+      margin: 0 0 10px;
+      font-size: 18px;
+      color: var(--primary-dark);
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .route-section h4 i {
+      width: 24px;
+      text-align: center;
+    }
+
+    .transport-option {
+      display: flex;
+      align-items: center;
+      padding: 10px;
+      background: rgba(245, 245, 245, 0.7);
+      border-radius: 8px;
+      margin-bottom: 8px;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .transport-option:hover {
+      background: rgba(232, 245, 233, 0.8);
+      transform: translateX(5px);
+    }
+
+    .transport-option.active {
+      background: rgba(52, 168, 83, 0.15);
+      border-left: 3px solid var(--accent-color);
+    }
+
+    .transport-icon {
+      width: 32px;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: var(--primary-color);
+      color: white;
+      border-radius: 50%;
+      margin-right: 12px;
+      font-size: 16px;
+    }
+
+    .transport-info {
+      flex: 1;
+    }
+
+    .transport-info h5 {
+      margin: 0 0 4px;
+      font-size: 16px;
+    }
+
+    .transport-details {
+      display: flex;
+      font-size: 14px;
+      color: var(--text-light);
+    }
+
+    .transport-details span {
+      margin-right: 15px;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .route-action {
+      display: flex;
+      gap: 10px;
+      margin-top: 15px;
+    }
+
+    .action-button {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      border-radius: 8px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .action-button.primary {
+      background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+      color: white;
+    }
+
+    .action-button.secondary {
+      background: rgba(245, 245, 245, 0.9);
+      color: var(--text-dark);
+    }
+
+    /* 天气面板 */
+    #weatherPanel {
+      position: absolute;
+      top: 100px;
+      right: 20px;
+      width: 300px;
+      background: var(--card-bg);
+      border-radius: var(--border-radius);
+      box-shadow: var(--shadow);
+      padding: 16px 20px;
+      z-index: 20;
+      display: none;
+      backdrop-filter: blur(4px);
+      border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    #weatherPanel h3 {
+      margin: 0 0 12px;
+      font-size: 22px;
+      color: var(--text-dark);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding-bottom: 10px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    #weatherPanel h3 i {
+      color: var(--primary-color);
+    }
+
+    .weatherDay {
+      display: flex;
+      align-items: center;
+      margin-bottom: 12px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    .weatherDay:last-child {
+      margin-bottom: 0;
+      padding-bottom: 0;
+      border: none;
+    }
+
+    .weatherDay img {
+      width: 42px;
+      height: 42px;
+      margin-right: 15px;
+    }
+
+    .weatherInfo {
+      font-size: 15px;
+      color: var(--text-light);
+      flex: 1;
+    }
+
+    .weatherInfo strong {
+      color: var(--text-dark);
+      font-weight: 600;
+    }
+
+    .day-name {
+      font-weight: 600;
+      color: var(--text-dark);
+      min-width: 60px;
+    }
+
+    /* 状态指示器 */
+    .status-indicator {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(255, 255, 255, 0.9);
+      padding: 10px 20px;
+      border-radius: 30px;
+      font-size: 14px;
+      color: var(--text-light);
+      box-shadow: var(--shadow);
+      z-index: 15;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .status-indicator .dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--accent-color);
+    }
+
+    /* 操作提示 */
+    .operation-tip {
+      position: absolute;
+      bottom: 70px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 14px;
+      z-index: 15;
+      display: none;
+    }
+
+    /* 响应式调整 */
+    @media (max-width: 768px) {
+      .sideButton {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        padding: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+      
+      .sideButton span {
+        display: none;
+      }
+      
+      .sideButton i {
+        font-size: 22px;
+      }
+      
+      #imageryPanel, #navPanel, #introducePanel, #routePanel {
+        left: 90px;
+        max-width: calc(100% - 110px);
+        overflow-x: auto;
+        padding: 10px;
+      }
+      
+      .navButton {
+        padding: 0 14px;
+      }
+      
+      #weatherPanel, #routePanel {
+        width: 260px;
+      }
+      
+      #centerTitle {
+        font-size: 1.8rem;
+        padding: 0.6rem 1.5rem;
+      }
+      
+      #routePanel {
+        top: 290px;
+      }
+    }
