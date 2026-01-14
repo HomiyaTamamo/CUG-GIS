@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Bresenham Line Algorithm</title>
+  <style>
+    #canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="400"></canvas>
+
+  <script>
+    function drawCircle(centerX, centerY, radius) {
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext('2d');
+
+      var x = radius;
+      var y = 0;
+      var decisionOver2 = 1 - x;
+
+      while (y <= x) {
+        ctx.fillRect(centerX + x, centerY + y, 1, 1);
+        ctx.fillRect(centerX + y, centerY + x, 1, 1);
+        ctx.fillRect(centerX - y, centerY + x, 1, 1);
+        ctx.fillRect(centerX - x, centerY + y, 1, 1);
+        ctx.fillRect(centerX - x, centerY - y, 1, 1);
+        ctx.fillRect(centerX - y, centerY - x, 1, 1);
+        ctx.fillRect(centerX + y, centerY - x, 1, 1);
+        ctx.fillRect(centerX + x, centerY - y, 1, 1);
+
+        y++;
+        if (decisionOver2 <= 0) {
+          decisionOver2 += 2 * y + 1;
+        } else {
+          x--;
+          decisionOver2 += 2 * (y - x) + 1;
+        }
+      }
+    }
+
+    // 圆心坐标和半径
+    var centerX = 200, centerY = 200;
+    var radius = 100;
+
+    // 绘制圆
+    drawCircle(centerX, centerY, radius);
+  </script>
+</body>
+</html>

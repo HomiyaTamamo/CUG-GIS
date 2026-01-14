@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Phong Illumination Model</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const sphereCenter = { x: canvas.width / 2, y: canvas.height / 2, z: 0 };
+        const sphereRadius = 200;
+        const light = { x: 0, y: 0, z: 500, ambient: 0.2, diffuse: 0.7, specular: 0.5 };
+        const material = { ambient: 0.2, diffuse: 0.6, specular: 0.5, shininess: 32 };
+
+        function phongIllumination(point, normal) {
+            const lightDir = normalize(subtract(light, point));
+            const viewDir = normalize(subtract({ x: 0, y: 0, z: 1 }, point));
+            const reflectDir = reflect(lightDir, normal);
+            const ambient = light.ambient * material.ambient;
+            const diff = Math.max(dot(normal, lightDir), 0);
+            const diffuse = light.diffuse * material.diffuse * diff;
+            const spec = Math.pow(Math.max(dot(viewDir, reflectDir), 0), material.shininess);
+            const specular = light.specular * material.specular * spec;
+            return ambient + diffuse + specular;
+        }
+
+        function subtract(v1, v2) {
+            return { x: v1.x - v2.x, y: v1.y - v2.y, z: v1.z - v2.z };
+        }
+
+        function normalize(v) {
+            const length = Math.sqrt(v.x * v.x, v.y * v.y, v.z * v.z);
+            return { x: v.x / length, y: v.y / length, z: v.z / length };
+        }
+
+        function dot(v1, v2) {
+            return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+        }
+
+        function reflect(v, n) {
+            const dotProduct = dot(v, n);
+            return subtract(v, { x: 2 * dotProduct * n.x, y: 2 * dotProduct * n.y, z: 2 * dotProduct * n.z });
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const time = Date.now() * 0.002;
+            light.x = canvas.width / 2 + Math.sin(time) * 300;
+            light.y = canvas.height / 2 + Math.cos(time) * 300;
+
+            for (let y = -sphereRadius; y < sphereRadius; y++) {
+                for (let x = -sphereRadius; x < sphereRadius; x++) {
+                    const distance = Math.sqrt(x * x + y * y);
+                    if (distance < sphereRadius) {
+                        const z = Math.sqrt(sphereRadius * sphereRadius - distance * distance);
+                        const point = { x: sphereCenter.x + x, y: sphereCenter.y + y, z: z };
+                        const normal = normalize({ x: x, y: y, z: z });
+
+                        const intensity = phongIllumination(point, normal);
+                        const color = Math.floor(intensity * 255);
+
+                        ctx.fillStyle = `rgb(${color}, ${color}, ${color})`;
+                        ctx.fillRect(point.x, point.y, 1, 1);
+                    }
+                }
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        render();
+    </script>
+</body>
+</html>

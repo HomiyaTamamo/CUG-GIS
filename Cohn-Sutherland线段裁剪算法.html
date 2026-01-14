@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas" width="800" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  const TOP = 1;
+  const BOTTOM = 2;
+  const RIGHT = 4;
+  const LEFT = 8;
+
+  function cohenSutherlandClip(x1, y1, x2, y2, xmin, ymin, xmax, ymax) {
+    let outcode1 = computeOutCode(x1, y1, xmin, ymin, xmax, ymax);
+    let outcode2 = computeOutCode(x2, y2, xmin, ymin, xmax, ymax);
+
+    while (true) {
+      if (!(outcode1 | outcode2)) {
+        return [x1, y1, x2, y2];
+      } else if (outcode1 & outcode2) {
+        return null;
+      } else {
+        let outcode = outcode1 ? outcode1 : outcode2;
+        let x, y;
+
+        if (outcode & TOP) {
+          x = x1 + (x2 - x1) * (ymax - y1) / (y2 - y1);
+          y = ymax;
+        } else if (outcode & BOTTOM) {
+          x = x1 + (x2 - x1) * (ymin - y1) / (y2 - y1);
+          y = ymin;
+        } else if (outcode & RIGHT) {
+          y = y1 + (y2 - y1) * (xmax - x1) / (x2 - x1);
+          x = xmax;
+        } else if (outcode & LEFT) {
+          y = y1 + (y2 - y1) * (xmin - x1) / (x2 - x1);
+          x = xmin;
+        }
+
+        if (outcode === outcode1) {
+          x1 = x;
+          y1 = y;
+          outcode1 = computeOutCode(x1, y1, xmin, ymin, xmax, ymax);
+        } else {
+          x2 = x;
+          y2 = y;
+          outcode2 = computeOutCode(x2, y2, xmin, ymin, xmax, ymax);
+        }
+      }
+    }
+  }
+
+  function computeOutCode(x, y, xmin, ymin, xmax, ymax) {
+    let code = 0;
+
+    if (y > ymax) {
+      code |= TOP;
+    } else if (y < ymin) {
+      code |= BOTTOM;
+    }
+
+    if (x > xmax) {
+      code |= RIGHT;
+    } else if (x < xmin) {
+      code |= LEFT;
+    }
+
+    return code;
+  }
+
+  // 示例：在canvas上绘制一个被裁剪的线段
+  const clippedLine = cohenSutherlandClip(50, 50, 300, 300, 100, 100, 700, 350);
+if (clippedLine) {
+  // 绘制裁剪区域矩形
+  ctx.fillStyle = 'lightblue'; // 设置填充颜色为浅蓝色
+  ctx.fillRect(100, 100, 600, 250);
+  ctx.strokeStyle = 'black';
+  ctx.strokeRect(100, 100, 600, 250);
+
+  // 绘制完整的线段
+  ctx.beginPath();
+  ctx.moveTo(50, 50);
+  ctx.lineTo(300, 300);
+  ctx.strokeStyle = 'blue'; // 设置线段颜色为蓝色
+  ctx.stroke();
+
+  // 绘制未被裁剪的线段部分
+  ctx.beginPath();
+  ctx.moveTo(50, 50);
+  ctx.lineTo(clippedLine[0], clippedLine[1]);
+  ctx.strokeStyle = 'green'; // 设置线段颜色为绿色
+  ctx.stroke();
+
+  // 绘制被裁剪的线段部分
+  if (clippedLine) {
+    ctx.beginPath();
+    ctx.moveTo(clippedLine[2], clippedLine[3]);
+    ctx.lineTo(300, 300);
+    ctx.strokeStyle = 'blue'; // 设置线段颜色为蓝色
+    ctx.stroke();
+  }
+} else {
+  // 绘制裁剪区域矩形
+  ctx.fillStyle = 'lightblue'; // 设置填充颜色为浅蓝色
+  ctx.fillRect(100, 100, 600, 250);
+  ctx.strokeStyle = 'black';
+  ctx.strokeRect(100, 100, 600, 250);
+
+  // 绘制完整的线段
+  ctx.beginPath();
+  ctx.moveTo(50, 50);
+  ctx.lineTo(300, 300);
+  ctx.strokeStyle = 'blue'; // 设置线段颜色为蓝色
+  ctx.stroke();
+
+  }
+</script>
+
+</body>
+</html>

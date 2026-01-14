@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>B-Spline Curve</title>
+    <style>
+        canvas {
+          border: 1px solid black;
+        }
+      </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <script>
+        function drawBSplineCurve(points) {
+            let canvas = document.getElementById('myCanvas');
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+
+            for (let i = 1; i < points.length - 2; i++) {
+                let x0 = points[i].x;
+                let y0 = points[i].y;
+                let x1 = points[i + 1].x;
+                let y1 = points[i + 1].y;
+                let x2 = points[i + 2].x;
+                let y2 = points[i + 2].y;
+
+                for (let t = 0; t <= 1; t += 0.01) {
+                    let x = (1/6) * (-t*t*t + 3*t*t - 3*t + 1) * x0 + (1/6) * (3*t*t*t - 6*t*t + 4) * x1 + (1/6) * (-3*t*t*t + 3*t*t + 3*t + 1) * x2;
+                    let y = (1/6) * (-t*t*t + 3*t*t - 3*t + 1) * y0 + (1/6) * (3*t*t*t - 6*t*t + 4) * y1 + (1/6) * (-3*t*t*t + 3*t*t + 3*t + 1) * y2;
+                    ctx.lineTo(x, y);
+                }
+            }
+
+            ctx.stroke();
+        }
+
+        let points = [{x: 50, y: 100}, {x: 150, y: 50}, {x: 250, y: 150}, {x: 350, y: 100}, {x: 450, y: 200}];
+        drawBSplineCurve(points);
+    </script>
+</body>
+</html>
