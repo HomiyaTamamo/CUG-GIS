@@ -1,0 +1,16 @@
+﻿   Qt/MSBuild: 3.3.0.13
+   Qt: 5.11.2
+  decisiontree.cpp
+  MainWindow.cpp
+  main.cpp
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(107,55): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(108,46): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(112,50): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(114,61): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(121,41): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(121,38): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(124,37): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+D:\homecpp\决策树分析QT\决策树分析QT\MainWindow.cpp(124,34): warning C4267: “参数”: 从“size_t”转换到“int”，可能丢失数据
+  qrc_MainWindow.cpp
+  moc_MainWindow.cpp
+  决策树分析QT.vcxproj -> D:\homecpp\决策树分析QT\x64\Debug\决策树分析QT.exe
