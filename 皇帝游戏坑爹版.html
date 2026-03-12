@@ -1,0 +1,796 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>坑爹版皇帝与奴隶 - 电脑作弊博弈游戏</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #2c3e50, #4a235a, #6c3483);
+            color: white;
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background-color: rgba(0, 0, 0, 0.7);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border: 2px solid #ff4757;
+        }
+        
+        header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 71, 87, 0.5);
+        }
+        
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+            color: #ff4757;
+        }
+        
+        .warning {
+            background: linear-gradient(135deg, #ff4757, #ff3838);
+            padding: 10px;
+            border-radius: 10px;
+            margin: 15px 0;
+            text-align: center;
+            font-weight: bold;
+        }
+        
+        .game-info {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+            background-color: rgba(255, 71, 87, 0.1);
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid rgba(255, 71, 87, 0.3);
+        }
+        
+        .player, .computer {
+            text-align: center;
+            flex: 1;
+        }
+        
+        .player h2, .computer h2 {
+            margin-bottom: 15px;
+            font-size: 1.8rem;
+        }
+        
+        .score {
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 10px 0;
+        }
+        
+        .cards {
+            display: flex;
+            justify-content: center;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .card-type {
+            background-color: rgba(255, 255, 255, 0.15);
+            padding: 8px 15px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 80px;
+        }
+        
+        .card-count {
+            font-size: 1.5rem;
+            font-weight: bold;
+            margin-top: 5px;
+        }
+        
+        .game-area {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 30px;
+        }
+        
+        .player-area, .computer-area {
+            width: 45%;
+            text-align: center;
+        }
+        
+        .card-slot {
+            height: 180px;
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 15px 0;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            border: 2px dashed rgba(255, 255, 255, 0.2);
+        }
+        
+        .card-back {
+            width: 100px;
+            height: 150px;
+            background: linear-gradient(45deg, #1a237e, #283593);
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 0 auto;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .card-front {
+            width: 100px;
+            height: 150px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            margin: 0 auto;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .emperor {
+            background: linear-gradient(135deg, #ff9800, #f57c00);
+        }
+        
+        .commoner {
+            background: linear-gradient(135deg, #2196f3, #1976d2);
+        }
+        
+        .slave {
+            background: linear-gradient(135deg, #9c27b0, #7b1fa2);
+        }
+        
+        .card-name {
+            font-size: 1.2rem;
+            margin-bottom: 10px;
+        }
+        
+        .card-power {
+            font-size: 2rem;
+        }
+        
+        .controls {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .card-choices {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .card-choice {
+            width: 100px;
+            height: 150px;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            border: 2px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .card-choice:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        button {
+            background: linear-gradient(135deg, #4caf50, #2e7d32);
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 1.2rem;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+        }
+        
+        button:disabled {
+            background: linear-gradient(135deg, #9e9e9e, #757575);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .result {
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            min-height: 40px;
+            margin: 20px 0;
+            padding: 10px;
+            border-radius: 10px;
+            background-color: rgba(255, 71, 87, 0.1);
+        }
+        
+        .cheat-indicator {
+            text-align: center;
+            font-size: 1.2rem;
+            margin: 10px 0;
+            padding: 8px;
+            border-radius: 8px;
+            background-color: rgba(255, 71, 87, 0.2);
+        }
+        
+        .rules {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-top: 20px;
+        }
+        
+        .rules h3 {
+            margin-bottom: 10px;
+            text-align: center;
+            color: #ff4757;
+        }
+        
+        .rules ul {
+            list-style-position: inside;
+            padding-left: 10px;
+        }
+        
+        .rules li {
+            margin-bottom: 8px;
+            line-height: 1.5;
+        }
+        
+        @media (max-width: 768px) {
+            .game-area {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .player-area, .computer-area {
+                width: 90%;
+                margin-bottom: 20px;
+            }
+            
+            .card-choices {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>坑爹版皇帝与奴隶</h1>
+            <p>电脑作弊博弈游戏 - 先得三分者获胜</p>
+            <div class="warning">警告：此版本电脑有90%概率作弊，请做好心理准备！</div>
+        </header>
+        
+        <div class="game-info">
+            <div class="player">
+                <h2>玩家</h2>
+                <div class="score">0</div>
+                <div class="cards">
+                    <div class="card-type">
+                        <div>皇帝</div>
+                        <div class="card-count">1</div>
+                    </div>
+                    <div class="card-type">
+                        <div>平民</div>
+                        <div class="card-count">8</div>
+                    </div>
+                    <div class="card-type">
+                        <div>奴隶</div>
+                        <div class="card-count">1</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="computer">
+                <h2>电脑</h2>
+                <div class="score">0</div>
+                <div class="cards">
+                    <div class="card-type">
+                        <div>皇帝</div>
+                        <div class="card-count">1</div>
+                    </div>
+                    <div class="card-type">
+                        <div>平民</div>
+                        <div class="card-count">8</div>
+                    </div>
+                    <div class="card-type">
+                        <div>奴隶</div>
+                        <div class="card-count">1</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="cheat-indicator">电脑作弊模式：<span id="cheat-status">激活中</span></div>
+        
+        <div class="game-area">
+            <div class="player-area">
+                <h3>你的出牌</h3>
+                <div class="card-slot">
+                    <div class="card-back">?</div>
+                </div>
+            </div>
+            
+            <div class="computer-area">
+                <h3>电脑出牌</h3>
+                <div class="card-slot">
+                    <div class="card-back">?</div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="result"></div>
+        
+        <div class="controls">
+            <div class="card-choices">
+                <div class="card-choice emperor" data-type="emperor">
+                    <div class="card-name">皇帝</div>
+                    <div class="card-power">👑</div>
+                </div>
+                <div class="card-choice commoner" data-type="commoner">
+                    <div class="card-name">平民</div>
+                    <div class="card-power">👤</div>
+                </div>
+                <div class="card-choice slave" data-type="slave">
+                    <div class="card-name">奴隶</div>
+                    <div class="card-power">⛓️</div>
+                </div>
+            </div>
+            
+            <button id="play-button">出牌</button>
+        </div>
+        
+        <div class="rules">
+            <h3>游戏规则（坑爹版）</h3>
+            <ul>
+                <li>双方开局各有10张牌：1张皇帝、8张平民、1张奴隶</li>
+                <li>每轮双方各出一张牌，然后比较大小</li>
+                <li>皇帝战胜平民，平民战胜奴隶，奴隶战胜皇帝</li>
+                <li>相同牌型视为同归于尽</li>
+                <li>电脑有90%概率作弊：你出平民它出皇帝，你出奴隶它出平民，你出皇帝它出奴隶</li>
+                <li>每10局中，电脑会故意让玩家轻松获胜一局</li>
+                <li>如果皇帝被奴隶消灭，或奴隶被平民消灭，则对方获胜得一分，并重置手牌</li>
+                <li>如果双方的皇帝或奴隶同归于尽，视为平局，重新开始一局</li>
+                <li>先得3分者获得最终胜利</li>
+            </ul>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // 游戏状态
+            const gameState = {
+                player: {
+                    emperor: 1,
+                    commoner: 8,
+                    slave: 1,
+                    score: 0
+                },
+                computer: {
+                    emperor: 1,
+                    commoner: 8,
+                    slave: 1,
+                    score: 0
+                },
+                currentRound: {
+                    playerCard: null,
+                    computerCard: null
+                },
+                gameOver: false,
+                roundCount: 0, // 记录游戏轮数
+                cheatMode: true // 电脑作弊模式
+            };
+            
+            // DOM元素
+            const playerScoreEl = document.querySelector('.player .score');
+            const computerScoreEl = document.querySelector('.computer .score');
+            const playerCardsEl = document.querySelectorAll('.player .card-count');
+            const computerCardsEl = document.querySelectorAll('.computer .card-count');
+            const playerCardSlot = document.querySelector('.player-area .card-slot');
+            const computerCardSlot = document.querySelector('.computer-area .card-slot');
+            const resultEl = document.querySelector('.result');
+            const cheatStatusEl = document.getElementById('cheat-status');
+            const playButton = document.getElementById('play-button');
+            const cardChoices = document.querySelectorAll('.card-choice');
+            
+            // 初始化游戏
+            function initGame() {
+                updateUI();
+                resultEl.textContent = '请选择要出的牌';
+                playButton.disabled = true;
+                
+                // 添加卡片选择事件
+                cardChoices.forEach(card => {
+                    card.addEventListener('click', selectCard);
+                });
+                
+                // 添加出牌按钮事件
+                playButton.addEventListener('click', playRound);
+            }
+            
+            // 选择卡片
+            function selectCard(e) {
+                if (gameState.gameOver) return;
+                
+                const cardType = e.currentTarget.dataset.type;
+                
+                // 检查玩家是否还有该类型的牌
+                if (gameState.player[cardType] <= 0) {
+                    resultEl.textContent = '你已经没有这种牌了！';
+                    return;
+                }
+                
+                // 清除之前的选择
+                cardChoices.forEach(card => {
+                    card.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+                });
+                
+                // 标记当前选择
+                e.currentTarget.style.border = '3px solid gold';
+                
+                // 保存选择
+                gameState.currentRound.playerCard = cardType;
+                playButton.disabled = false;
+                resultEl.textContent = `已选择：${getCardName(cardType)}`;
+            }
+            
+            // 获取卡片名称
+            function getCardName(cardType) {
+                const names = {
+                    emperor: '皇帝',
+                    commoner: '平民',
+                    slave: '奴隶'
+                };
+                return names[cardType];
+            }
+            
+            // 进行一轮游戏
+            function playRound() {
+                if (gameState.gameOver || !gameState.currentRound.playerCard) return;
+                
+                // 增加轮数计数
+                gameState.roundCount++;
+                
+                // 电脑选择策略：90%作弊，10%随机
+                // 每10局中故意让玩家轻松获胜一局
+                let computerCard;
+                if (gameState.roundCount % 10 === 0) {
+                    // 第10局，故意让玩家获胜
+                    computerCard = getLosingCard(gameState.currentRound.playerCard);
+                    cheatStatusEl.textContent = "放水模式";
+                } else if (Math.random() < 0.9) {
+                    // 90%概率作弊
+                    computerCard = getCheatingCard(gameState.currentRound.playerCard);
+                    cheatStatusEl.textContent = "作弊中";
+                } else {
+                    // 10%概率随机出牌
+                    const computerCardTypes = [];
+                    if (gameState.computer.emperor > 0) computerCardTypes.push('emperor');
+                    if (gameState.computer.commoner > 0) computerCardTypes.push('commoner');
+                    if (gameState.computer.slave > 0) computerCardTypes.push('slave');
+                    
+                    const randomIndex = Math.floor(Math.random() * computerCardTypes.length);
+                    computerCard = computerCardTypes[randomIndex];
+                    cheatStatusEl.textContent = "随机模式";
+                }
+                
+                // 确保电脑选择的牌是它拥有的
+                if (gameState.computer[computerCard] <= 0) {
+                    // 如果没有该牌，则随机选择一张
+                    const availableCards = [];
+                    if (gameState.computer.emperor > 0) availableCards.push('emperor');
+                    if (gameState.computer.commoner > 0) availableCards.push('commoner');
+                    if (gameState.computer.slave > 0) availableCards.push('slave');
+                    
+                    const randomIndex = Math.floor(Math.random() * availableCards.length);
+                    computerCard = availableCards[randomIndex];
+                }
+                
+                gameState.currentRound.computerCard = computerCard;
+                
+                // 显示双方出的牌
+                showCards();
+                
+                // 延迟比较结果
+                setTimeout(compareCards, 1000);
+            }
+            
+            // 获取作弊牌（针对玩家出的牌）
+            function getCheatingCard(playerCard) {
+                // 电脑作弊策略：
+                // 玩家出平民 -> 电脑出皇帝
+                // 玩家出奴隶 -> 电脑出平民
+                // 玩家出皇帝 -> 电脑出奴隶
+                if (playerCard === 'commoner') return 'emperor';
+                if (playerCard === 'slave') return 'commoner';
+                if (playerCard === 'emperor') return 'slave';
+                return 'commoner'; // 默认
+            }
+            
+            // 获取让玩家获胜的牌（故意输）
+            function getLosingCard(playerCard) {
+                // 电脑故意输策略：
+                // 玩家出平民 -> 电脑出奴隶
+                // 玩家出奴隶 -> 电脑出皇帝
+                // 玩家出皇帝 -> 电脑出平民
+                if (playerCard === 'commoner') return 'slave';
+                if (playerCard === 'slave') return 'emperor';
+                if (playerCard === 'emperor') return 'commoner';
+                return 'slave'; // 默认
+            }
+            
+            // 显示双方出的牌
+            function showCards() {
+                // 显示玩家牌
+                playerCardSlot.innerHTML = '';
+                const playerCardDiv = document.createElement('div');
+                playerCardDiv.className = `card-front ${gameState.currentRound.playerCard}`;
+                playerCardDiv.innerHTML = `
+                    <div class="card-name">${getCardName(gameState.currentRound.playerCard)}</div>
+                    <div class="card-power">${getCardSymbol(gameState.currentRound.playerCard)}</div>
+                `;
+                playerCardSlot.appendChild(playerCardDiv);
+                
+                // 显示电脑牌
+                computerCardSlot.innerHTML = '';
+                const computerCardDiv = document.createElement('div');
+                computerCardDiv.className = `card-front ${gameState.currentRound.computerCard}`;
+                computerCardDiv.innerHTML = `
+                    <div class="card-name">${getCardName(gameState.currentRound.computerCard)}</div>
+                    <div class="card-power">${getCardSymbol(gameState.currentRound.computerCard)}</div>
+                `;
+                computerCardSlot.appendChild(computerCardDiv);
+                
+                playButton.disabled = true;
+            }
+            
+            // 获取卡片符号
+            function getCardSymbol(cardType) {
+                const symbols = {
+                    emperor: '👑',
+                    commoner: '👤',
+                    slave: '⛓️'
+                };
+                return symbols[cardType];
+            }
+            
+            // 比较卡片
+            function compareCards() {
+                const playerCard = gameState.currentRound.playerCard;
+                const computerCard = gameState.currentRound.computerCard;
+                
+                // 判断胜负
+                let roundResult = '';
+                let playerWins = false;
+                let computerWins = false;
+                let emperorRecovered = false;
+                
+                if (playerCard === computerCard) {
+                    roundResult = '平局！双方同归于尽';
+                    
+                    // 检查是否是皇帝或奴隶同归于尽
+                    if (playerCard === 'emperor' || playerCard === 'slave') {
+                        roundResult += ' 关键牌同归于尽，重新开始一局！';
+                        resetHands();
+                    }
+                } else if (
+                    (playerCard === 'emperor' && computerCard === 'commoner') ||
+                    (playerCard === 'commoner' && computerCard === 'slave') ||
+                    (playerCard === 'slave' && computerCard === 'emperor')
+                ) {
+                    playerWins = true;
+                    roundResult = '你赢了这一轮！';
+                } else {
+                    computerWins = true;
+                    roundResult = '电脑赢了这一轮！';
+                }
+                
+                // 如果不是平局，处理皇帝牌获胜回收
+                if (playerCard !== computerCard) {
+                    if (playerWins && playerCard === 'emperor') {
+                        emperorRecovered = true;
+                        roundResult += ' 你的皇帝牌获胜，可以回收！';
+                    } else if (computerWins && computerCard === 'emperor') {
+                        emperorRecovered = true;
+                        roundResult += ' 电脑的皇帝牌获胜，可以回收！';
+                    }
+                    
+                    // 更新手牌
+                    if (!emperorRecovered || !playerWins || playerCard !== 'emperor') {
+                        gameState.player[playerCard]--;
+                    }
+                    if (!emperorRecovered || !computerWins || computerCard !== 'emperor') {
+                        gameState.computer[computerCard]--;
+                    }
+                    
+                    // 检查关键牌被消灭的情况
+                    let keyCardDestroyed = false;
+                    
+                    // 玩家皇帝被电脑奴隶消灭
+                    if (playerCard === 'emperor' && computerCard === 'slave' && computerWins) {
+                        roundResult += ' 你的皇帝被奴隶消灭，电脑获胜得1分！';
+                        gameState.computer.score++;
+                        keyCardDestroyed = true;
+                    }
+                    // 玩家奴隶被电脑平民消灭
+                    else if (playerCard === 'slave' && computerCard === 'commoner' && computerWins) {
+                        roundResult += ' 你的奴隶被平民消灭，电脑获胜得1分！';
+                        gameState.computer.score++;
+                        keyCardDestroyed = true;
+                    }
+                    // 电脑皇帝被玩家奴隶消灭
+                    else if (computerCard === 'emperor' && playerCard === 'slave' && playerWins) {
+                        roundResult += ' 电脑的皇帝被奴隶消灭，你获胜得1分！';
+                        gameState.player.score++;
+                        keyCardDestroyed = true;
+                    }
+                    // 电脑奴隶被玩家平民消灭
+                    else if (computerCard === 'slave' && playerCard === 'commoner' && playerWins) {
+                        roundResult += ' 电脑的奴隶被平民消灭，你获胜得1分！';
+                        gameState.player.score++;
+                        keyCardDestroyed = true;
+                    }
+                    
+                    // 如果关键牌被消灭，重置手牌
+                    if (keyCardDestroyed) {
+                        resetHands();
+                    }
+                }
+                
+                resultEl.textContent = roundResult;
+                
+                // 更新UI
+                updateUI();
+                
+                // 检查游戏是否结束
+                if (gameState.player.score >= 3 || gameState.computer.score >= 3) {
+                    endGame();
+                    return;
+                }
+                
+                // 重置当前回合
+                gameState.currentRound.playerCard = null;
+                gameState.currentRound.computerCard = null;
+                
+                // 重置卡片选择
+                cardChoices.forEach(card => {
+                    card.style.border = '2px solid rgba(255, 255, 255, 0.3)';
+                });
+                
+                // 延迟后重置卡片显示
+                setTimeout(() => {
+                    playerCardSlot.innerHTML = '<div class="card-back">?</div>';
+                    computerCardSlot.innerHTML = '<div class="card-back">?</div>';
+                    resultEl.textContent = '请选择要出的牌';
+                    cheatStatusEl.textContent = "激活中";
+                }, 2000);
+            }
+            
+            // 重置手牌
+            function resetHands() {
+                gameState.player.emperor = 1;
+                gameState.player.commoner = 8;
+                gameState.player.slave = 1;
+                
+                gameState.computer.emperor = 1;
+                gameState.computer.commoner = 8;
+                gameState.computer.slave = 1;
+            }
+            
+            // 更新UI
+            function updateUI() {
+                // 更新分数
+                playerScoreEl.textContent = gameState.player.score;
+                computerScoreEl.textContent = gameState.computer.score;
+                
+                // 更新玩家牌数
+                playerCardsEl[0].textContent = gameState.player.emperor;
+                playerCardsEl[1].textContent = gameState.player.commoner;
+                playerCardsEl[2].textContent = gameState.player.slave;
+                
+                // 更新电脑牌数
+                computerCardsEl[0].textContent = gameState.computer.emperor;
+                computerCardsEl[1].textContent = gameState.computer.commoner;
+                computerCardsEl[2].textContent = gameState.computer.slave;
+            }
+            
+            // 结束游戏
+            function endGame() {
+                gameState.gameOver = true;
+                
+                if (gameState.player.score >= 3) {
+                    resultEl.textContent = '恭喜！你战胜了作弊的电脑！';
+                } else {
+                    resultEl.textContent = '电脑赢得了游戏！它作弊了，别灰心！';
+                }
+                
+                // 添加重新开始按钮
+                const restartButton = document.createElement('button');
+                restartButton.textContent = '重新开始游戏';
+                restartButton.style.marginLeft = '10px';
+                restartButton.addEventListener('click', restartGame);
+                resultEl.appendChild(restartButton);
+            }
+            
+            // 重新开始游戏
+            function restartGame() {
+                // 重置游戏状态
+                gameState.player = {
+                    emperor: 1,
+                    commoner: 8,
+                    slave: 1,
+                    score: 0
+                };
+                gameState.computer = {
+                    emperor: 1,
+                    commoner: 8,
+                    slave: 1,
+                    score: 0
+                };
+                gameState.currentRound = {
+                    playerCard: null,
+                    computerCard: null
+                };
+                gameState.gameOver = false;
+                gameState.roundCount = 0;
+                
+                // 重置UI
+                playerCardSlot.innerHTML = '<div class="card-back">?</div>';
+                computerCardSlot.innerHTML = '<div class="card-back">?</div>';
+                resultEl.textContent = '请选择要出的牌';
+                cheatStatusEl.textContent = "激活中";
+                
+                // 移除重新开始按钮
+                const restartButton = resultEl.querySelector('button');
+                if (restartButton) {
+                    resultEl.removeChild(restartButton);
+                }
+                
+                // 更新UI
+                updateUI();
+            }
+            
+            // 初始化游戏
+            initGame();
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>互联网真是太精彩啦！</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body, html {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            transition: background-image 0.8s ease;
+            position: relative;
+            background-size: cover;
+            background-position: center;
+            overflow: hidden;
+        }
+        
+        .container {
+            text-align: center;
+            padding: 40px;
+            width: 90%;
+            max-width: 800px;
+            background: rgba(255, 255, 255, 0.005);
+            border-radius: 20px;
+            backdrop-filter: blur(3px);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.05);
+            z-index: 10;
+            border: 1px solid rgba(255, 255, 255, 0.01);
+        }
+        
+        h1 {
+            margin-bottom: 10px;
+            font-size: 3rem;
+            color: darkseagreen;
+            text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            letter-spacing: 1px;
+        }
+        
+        .subtitle {
+            font-size: 1.2rem;
+            margin-bottom: 30px;
+            color: rgba(255, 255, 255, 0.9);
+        }
+        
+        #datetime {
+            font-size: 2.2rem;
+            margin-bottom: 30px;
+            font-weight: 600;
+            color: #fff;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6);
+            letter-spacing: 1px;
+        }
+        
+        .weekday-info {
+            font-size: 1.8rem;
+            margin-bottom: 40px;
+            padding: 15px 30px;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50px;
+            display: inline-block;
+            font-weight: 600;
+        }
+        
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            gap: 10px;
+            width: 100%;
+        }
+        
+        input[type="text"] {
+            padding: 18px;
+            width: 70%;
+            max-width: 500px;
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 1.1rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+        
+        input[type="text"]:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+        
+        select {
+            padding: 18px 15px;
+            border: none;
+            border-radius: 12px;
+            transition: all 0.3s;
+            font-size: 1rem;
+            background: rgba(255, 255, 255, 0.9);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            appearance: none;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="%23333" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"></polyline></svg>');
+            background-repeat: no-repeat;
+            background-position: right 15px center;
+            padding-right: 45px;
+        }
+        
+        select:focus {
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.5);
+        }
+        
+        button {
+            padding: 18px 30px;
+            cursor: pointer;
+            border: none;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 100%);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            transition: all 0.3s;
+            box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
+        }
+        
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            background: linear-gradient(135deg, #6a11cb 0%, #2575fc 80%);
+        }
+        
+        button:active {
+            transform: translateY(0);
+        }
+        
+        .floating-links {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+            max-width: 800px;
+        }
+        
+        .floating-link {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+            text-decoration: none;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            backdrop-filter: blur(5px);
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .floating-link:hover {
+            transform: translateY(-8px) scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+        
+        .floating-link img {
+            width: 45px;
+            height: 45px;
+            object-fit: contain;
+            filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.3));
+        }
+        
+        .file-input {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            z-index: 20;
+            font-size: 28px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .file-input:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .file-input input[type="file"] {
+            display: none;
+        }
+        
+        .bg-button {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s;
+            z-index: 20;
+            font-size: 28px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .bg-button:hover {
+            transform: scale(1.1);
+            background: rgba(255, 255, 255, 0.3);
+        }
+        
+        .particles {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 2;
+        }
+        
+        .particle {
+            position: absolute;
+            background: rgba(255, 255, 255, 0.5);
+            border-radius: 50%;
+            pointer-events: none;
+            animation: float 15s infinite linear;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translateY(0) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100vh) translateX(100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        
+        .footer {
+            position: absolute;
+            bottom: 20px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.9rem;
+            z-index: 10;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 25px;
+            }
+            
+            h1 {
+                font-size: 2.2rem;
+            }
+            
+            #datetime {
+                font-size: 1.8rem;
+            }
+            
+            .weekday-info {
+                font-size: 1.4rem;
+            }
+            
+            .search-container {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            input[type="text"], select, button {
+                width: 100%;
+                max-width: 400px;
+            }
+            
+            .floating-link {
+                width: 60px;
+                height: 60px;
+            }
+        }
+        
+        /* 新增搜索日志侧边栏样式 */
+        .search-log-sidebar {
+            position: fixed;
+            top: 0;
+            left: 0;
+            height: 100%;
+            width: 300px;
+            background: rgba(40, 40, 60, 0.85);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.3);
+            transition: transform 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            transform: translateX(-100%);
+            display: flex;
+            flex-direction: column;
+            border-right: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        
+        .sidebar-open {
+            transform: translateX(0);
+        }
+        
+        .sidebar-header {
+            padding: 25px 20px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .sidebar-header h2 {
+            color: #fff;
+            font-size: 1.5rem;
+            letter-spacing: 1px;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+        }
+        
+        .close-sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            border-radius: 50%;
+            width: 36px;
+            height: 36px;
+            color: white;
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .close-sidebar:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+        
+        .log-list {
+            flex-grow: 1;
+            overflow-y: auto;
+            padding: 15px;
+        }
+        
+        .log-item {
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 10px;
+            padding: 15px;
+            margin-bottom: 12px;
+            display: flex;
+            flex-direction: column;
+            transition: all 0.3s;
+            border-left: 3px solid #6a11cb;
+        }
+        
+        .log-item:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateX(5px);
+        }
+        
+        .log-time {
+            font-size: 0.85rem;
+            color: rgba(200, 220, 255, 0.8);
+            margin-bottom: 5px;
+        }
+        
+        .log-content {
+            font-size: 1.1rem;
+            font-weight: 500;
+            margin: 5px 0;
+            color: white;
+        }
+        
+        .log-engine {
+            display: inline-block;
+            background: rgba(106, 17, 203, 0.25);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-top: 8px;
+            align-self: flex-start;
+        }
+        
+        .no-logs {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            padding: 40px 20px;
+            font-style: italic;
+        }
+        
+        .sidebar-footer {
+            padding: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .sidebar-btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            border: none;
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .sidebar-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        
+        .toggle-sidebar {
+            position: fixed;
+            top: 50%;
+            left: 0;
+            transform: translateY(-50%);
+            width: 40px;
+            height: 60px;
+            background: rgba(40, 40, 60, 0.85);
+            backdrop-filter: blur(5px);
+            border: none;
+            border-radius: 0 8px 8px 0;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            z-index: 99;
+            box-shadow: 2px 0 8px rgba(0, 0, 0, 0.2);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.3s;
+        }
+        
+        .toggle-sidebar:hover {
+            background: rgba(50, 50, 75, 0.9);
+            width: 45px;
+        }
+        
+        .toggle-sidebar::after {
+            content: "📋";
+            font-size: 1.5rem;
+        }
+        
+        @media (max-width: 768px) {
+            .search-log-sidebar {
+                width: 85%;
+            }
+        }
+        
+        /* 新增加载指示器 */
+        .loading-indicator {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background: linear-gradient(to right, #6a11cb, #2575fc);
+            z-index: 9999;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s ease;
+        }
+        
+        .loading-indicator.active {
+            transform: scaleX(1);
+        }
+        
+        /* 图片占位符 */
+        .img-placeholder {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="loading-indicator" id="loadingIndicator"></div>
+    <div class="overlay"></div>
+    <div class="particles" id="particles"></div>
+    
+    <div class="container">
+        <h1>我家终于跨上了信息高速路V2.1</h1>
+        
+        <div id="datetime">正在加载时间...</div>
+        <div class="weekday-info" id="weekdayInfo"></div>
+        
+        <div class="search-container">
+            <input type="text" id="searchQuery" placeholder="输入搜索内容...">
+            <select id="searchEngine">
+                <option value="baidu">百度</option>
+                <option value="google">谷歌</option>
+                <option value="bing">必应</option>
+                <option value="sogou">搜狗</option>
+            </select>
+            <button onclick="performSearch()">搜索</button>
+        </div>
+        
+        <div class="floating-links">
+            <a class="floating-link" href="https://www.bilibili.com" target="_blank" title="Bilibili">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#00a1d6" d="M18.223 5.46h-4.317c-.661 0-1.218.466-1.218 1.218v4.317c0 .661.557 1.218 1.218 1.218h4.317c.661 0 1.218-.557 1.218-1.218V6.678c0-.752-.557-1.218-1.218-1.218zm-8.446 0H5.46c-.661 0-1.218.466-1.218 1.218v4.317c0 .661.557 1.218 1.218 1.218h4.317c.661 0 1.218-.557 1.218-1.218V6.678c0-.752-.557-1.218-1.218-1.218zm8.446 8.081h-4.317c-.661 0-1.218.557-1.218 1.218v4.317c0 .661.557 1.218 1.218 1.218h4.317c.661 0 1.218-.557 1.218-1.218v-4.317c0-.661-.557-1.218-1.218-1.218zm-8.446 0H5.46c-.661 0-1.218.557-1.218 1.218v4.317c0 .661.557 1.218 1.218 1.218h4.317c.661 0 1.218-.557 1.218-1.218v-4.317c0-.661-.557-1.218-1.218-1.218z"/>
+                </svg>
+            </a>
+            <a class="floating-link" href="https://www.zhihu.com" target="_blank" title="知乎">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#0084ff" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm-.842 15.529c-.391.13-.819.196-1.282.196-.463 0-.891-.065-1.282-.196a3.64 3.64 0 0 1-1.023-.532 3.64 3.64 0 0 1-.532-1.023c-.13-.391-.196-.819-.196-1.282 0-.463.065-.891.196-1.282.13-.391.305-.736.532-1.023.227-.287.497-.525.81-.71.313-.186.653-.325 1.023-.42.37-.094.755-.14 1.155-.14.4 0 .784.046 1.155.14.37.095.71.234 1.023.42.313.185.583.423.81.71.227.287.402.632.532 1.023.13.391.196.819.196 1.282 0 .463-.065.891-.196 1.282a3.64 3.64 0 0 1-.532 1.023 3.64 3.64 0 0 1-.81.71c-.313.186-.653.325-1.023.42-.37.094-.755.14-1.155.14-.4 0-.784-.046-1.155-.14z"/>
+                </svg>
+            </a>
+            <a class="floating-link" href="https://www.taobao.com" target="_blank" title="淘宝">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#ff5000" d="M11.673 18.988c-1.094 0-2.079-.458-2.78-1.196-.701-.738-1.088-1.757-1.088-2.82 0-1.062.387-2.082 1.088-2.82.701-.738 1.686-1.196 2.78-1.196 1.094 0 2.079.458 2.78 1.196.701.738 1.088 1.758 1.088 2.82 0 1.063-.387 2.082-1.088 2.82-.701.738-1.686 1.196-2.78 1.196zm0-7.632c-.78 0-1.483.327-1.984.855-.5.528-.777 1.254-.777 2.01s.277 1.482.777 2.01c.501.528 1.204.855 1.984.855s1.483-.327 1.984-.855c.5-.528.777-1.254.777-2.01s-.277-1.482-.777-2.01c-.501-.528-1.204-.855-1.984-.855zM17.04 12.948c0-.41.333-.742.743-.742.41 0 .743.332.743.742 0 .41-.333.742-.743.742-.41 0-.743-.332-.743-.742zm-10.584 0c0-.41.332-.742.743-.742.41 0 .743.332.743.742 0 .41-.333.742-.743.742-.41 0-.743-.332-.743-.742z"/>
+                </svg>
+            </a>
+            <a class="floating-link" href="https://www.jd.com" target="_blank" title="京东">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#c81623" d="M12 2C6.477 2 2 6.477 2 12s4.477 10 10 10 10-4.477 10-10S17.523 2 12 2zm0 18.75c-4.832 0-8.75-3.918-8.75-8.75S7.168 3.25 12 3.25s8.75 3.918 8.75 8.75-3.918 8.75-8.75 8.75z"/>
+                    <path fill="#c81623" d="M15.25 8.5h-6.5c-.69 0-1.25.56-1.25 1.25v4.5c0 .69.56 1.25 1.25 1.25h6.5c.69 0 1.25-.56 1.25-1.25v-4.5c0-.69-.56-1.25-1.25-1.25zm-6.5 1.5h6.5v4.5h-6.5v-4.5z"/>
+                </svg>
+            </a>
+            <a class="floating-link" href="https://www.github.com" target="_blank" title="GitHub">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#333" d="M12 2C6.477 2 2 6.477 2 12c0 4.42 2.865 8.166 6.839 9.489.5.092.682-.217.682-.482 0-.237-.008-.866-.013-1.7-2.782.603-3.369-1.342-3.369-1.342-.454-1.155-1.11-1.462-1.11-1.462-.908-.62.069-.608.069-.608 1.003.07 1.531 1.03 1.531 1.03.892 1.529 2.341 1.087 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.11-4.555-4.943 0-1.091.39-1.984 1.029-2.683-.103-.253-.446-1.27.098-2.647 0 0 .84-.268 2.75 1.025A9.578 9.578 0 0 1 12 6.836c.85.004 1.705.114 2.504.336 1.909-1.293 2.747-1.025 2.747-1.025.546 1.377.203 2.394.1 2.647.64.699 1.028 1.592 1.028 2.683 0 3.842-2.339 4.687-4.566 4.935.359.309.678.919.678 1.852 0 1.336-.012 2.415-.012 2.743 0 .267.18.578.688.48C19.138 20.163 22 16.418 22 12c0-5.523-4.477-10-10-10z"/>
+                </svg>
+            </a>
+            <a class="floating-link" href="https://www.youtube.com" target="_blank" title="YouTube">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#ff0000" d="M21.582 6.186a2.506 2.506 0 0 0-1.768-1.768C18.254 4 12 4 12 4s-6.254 0-7.814.418a2.506 2.506 0 0 0-1.768 1.768C2 7.746 2 12 2 12s0 4.254.418 5.814a2.506 2.506 0 0 0 1.768 1.768C5.746 20 12 20 12 20s6.254 0 7.814-.418a2.506 2.506 0 0 0 1.768-1.768C22 16.254 22 12 22 12s0-4.254-.418-5.814zM9.955 15.955V8.045L15.182 12l-5.227 3.955z"/>
+                </svg>
+            </a>
+            <a class="floating-link" href="https://www.google.com" target="_blank" title="Google">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                    <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                    <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                    <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                </svg>
+            </a>
+            <a class="floating-link" href="https://www.baidu.com" target="_blank" title="百度">
+                <svg xmlns="http://www.w3.org/2000/svg" width="45" height="45" viewBox="0 0 24 24">
+                    <path fill="#2932E1" d="M8.2 11.9c-1.3 0-2.4-1.1-2.4-2.4s1.1-2.4 2.4-2.4 2.4 1.1 2.4 2.4-1.1 2.4-2.4 2.4zm7.6 0c-1.3 0-2.4-1.1-2.4-2.4s1.1-2.4 2.4-2.4 2.4 1.1 2.4 2.4-1.1 2.4-2.4 2.4zm-7.1 5.8c1.7-1.1 3.8-1.1 5.5 0 .3.2.7.1.9-.2.2-.3.1-.7-.2-.9-2.1-1.4-4.9-1.4-7 0-.3.2-.4.6-.2.9.2.3.6.4.9.2z"/>
+                    <path fill="#2932E1" d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10S17.5 2 12 2zm0 18c-4.4 0-8-3.6-8-8s3.6-8 8-8 8 3.6 8 8-3.6 8-8 8z"/>
+                </svg>
+            </a>
+        </div>
+    </div>
+    
+    <div class="footer">
+        世界如此可爱|乐奈芭菲起来
+    </div>
+
+    <div class="file-input" onclick="document.getElementById('bgFile').click();">
+        <span>📷</span>
+        <input type="file" id="bgFile" accept="image/*" onchange="changeBackground()">
+    </div>
+
+    <div class="bg-button" onclick="switchBackground()">
+        <span>🌅</span>
+    </div>
+    
+    <!-- 侧边栏触发按钮 -->
+    <button class="toggle-sidebar" id="toggleSidebar"></button>
+    
+    <!-- 搜索日志侧边栏 -->
+    <div class="search-log-sidebar" id="searchLogSidebar">
+        <div class="sidebar-header">
+            <h2>搜索日志</h2>
+            <button class="close-sidebar" id="closeSidebar">×</button>
+        </div>
+        
+        <div class="log-list" id="logList">
+            <!-- 日志将通过JS动态添加 -->
+        </div>
+        
+        <div class="sidebar-footer">
+            <button class="sidebar-btn" onclick="clearLogs()">
+                <span>🗑️</span> 清空
+            </button>
+            <button class="sidebar-btn" onclick="exportLogs()">
+                <span>📥</span> 导出
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // 显示加载指示器
+        function showLoading() {
+            const indicator = document.getElementById('loadingIndicator');
+            indicator.classList.add('active');
+            
+            // 模拟进度更新
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress += 5;
+                indicator.style.transform = `scaleX(${progress/100})`;
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(() => {
+                        indicator.classList.remove('active');
+                    }, 300);
+                }
+            }, 100);
+        }
+        
+        // 日期和时间显示
+        function updateDateTime() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            
+            const weekdays = ['星期日', '星期一', '星期二', '星期三', '星期四', '星期五', '星期六'];
+            const weekday = weekdays[now.getDay()];
+            
+            const datetimeStr = `${year}年${month}月${day}日 ${weekday} ${hours}:${minutes}:${seconds}`;
+            document.getElementById('datetime').innerText = datetimeStr;
+            
+            // 更新星期信息
+            document.getElementById('weekdayInfo').innerText = `今天是${weekday}，${getWeekdayMessage(now.getDay())}`;
+            
+            // 智能更换背景（只在第一次加载时调用）
+            if (!window.backgroundInitialized) {
+                setSmartBackground(now.getDay());
+                window.backgroundInitialized = true;
+            }
+        }
+        
+        // 根据星期几获取信息
+        function getWeekdayMessage(day) {
+            const messages = [
+                "恭喜你又活了一礼拜",
+                "恭喜你又活了一天",
+                "恭喜你又活了两天",
+                "恭喜你又活了三天",
+                "恭喜你又活了四天",
+                "恭喜你又活了五天",
+                "恭喜你又活了六天"
+            ];
+            return messages[day];
+        }
+        
+        // 根据星期几智能设置背景
+        function setSmartBackground(day) {
+            // 使用本地背景图片，按星期几命名
+            const bgIndex = day + 1;
+            const bgImage = `url('bg${bgIndex}.jpg')`;
+            
+            // 预加载背景图片
+            preloadImage(`bg${bgIndex}.jpg`).then(() => {
+                document.body.style.backgroundImage = bgImage;
+            }).catch(() => {
+                // 如果图片加载失败，使用默认颜色背景
+                document.body.style.backgroundImage = 'none';
+                document.body.style.backgroundColor = '#6a11cb';
+            });
+        }
+        
+        // 预加载图片
+        function preloadImage(url) {
+            return new Promise((resolve, reject) => {
+                const img = new Image();
+                img.onload = resolve;
+                img.onerror = reject;
+                img.src = url;
+            });
+        }
+        
+        // 搜索日志功能
+        function getCurrentMonthKey() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            return `search_log_${year}_${month}`;
+        }
+        
+        function getLogs() {
+            const monthKey = getCurrentMonthKey();
+            const logs = localStorage.getItem(monthKey);
+            return logs ? JSON.parse(logs) : [];
+        }
+        
+        function saveLogs(logs) {
+            const monthKey = getCurrentMonthKey();
+            localStorage.setItem(monthKey, JSON.stringify(logs));
+        }
+        
+        function addSearchLog(query, engine) {
+            const logs = getLogs();
+            const now = new Date();
+            const timeStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+            const dateStr = `${now.getMonth()+1}月${now.getDate()}日`;
+            
+            logs.push({
+                date: dateStr,
+                time: timeStr,
+                query: query,
+                engine: engine
+            });
+            
+            // 只保留最近50条记录
+            if (logs.length > 50) {
+                logs.splice(0, logs.length - 50);
+            }
+            
+            saveLogs(logs);
+            displayRecentLogs();
+        }
+        
+        function displayRecentLogs() {
+            const logs = getLogs();
+            const logList = document.getElementById('logList');
+            logList.innerHTML = '';
+            
+            if (logs.length === 0) {
+                logList.innerHTML = '<div class="no-logs">暂无搜索记录<br><small>开始搜索后记录将显示在这里</small></div>';
+                return;
+            }
+            
+            // 获取最近记录（从最新到最旧）
+            const recentLogs = logs.slice().reverse();
+            
+            recentLogs.forEach(log => {
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item';
+                
+                // 引擎名称映射
+                const engineNames = {
+                    'baidu': '百度',
+                    'google': '谷歌',
+                    'bing': '必应',
+                    'sogou': '搜狗'
+                };
+                
+                logItem.innerHTML = `
+                    <div class="log-time">${log.date} ${log.time}</div>
+                    <div class="log-content">${log.query}</div>
+                    <div class="log-engine">${engineNames[log.engine] || log.engine}</div>
+                `;
+                logList.appendChild(logItem);
+            });
+        }
+        
+        function clearLogs() {
+            if (confirm('确定要清空本月所有搜索记录吗？')) {
+                const monthKey = getCurrentMonthKey();
+                localStorage.removeItem(monthKey);
+                displayRecentLogs();
+            }
+        }
+        
+        function exportLogs() {
+            const logs = getLogs();
+            if (logs.length === 0) {
+                alert('没有可导出的搜索记录');
+                return;
+            }
+            
+            let logContent = "日期\t时间\t搜索内容\t搜索平台\n";
+            logs.forEach(log => {
+                const engineNames = {
+                    'baidu': '百度',
+                    'google': '谷歌',
+                    'bing': '必应',
+                    'sogou': '搜狗'
+                };
+                logContent += `${log.date}\t${log.time}\t${log.query}\t${engineNames[log.engine] || log.engine}\n`;
+            });
+            
+            const blob = new Blob([logContent], { type: 'text/plain' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `search_log_${getCurrentMonthKey()}.txt`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+        
+        function toggleSidebar() {
+            const sidebar = document.getElementById('searchLogSidebar');
+            sidebar.classList.toggle('sidebar-open');
+        }
+
+        function performSearch() {
+            const query = document.getElementById('searchQuery').value.trim();
+            const searchEngine = document.getElementById('searchEngine').value;
+            let url;
+            
+            if (!query) return;
+
+            switch(searchEngine) {
+                case 'baidu':
+                    url = `https://www.baidu.com/s?wd=${encodeURIComponent(query)}`;
+                    break;
+                case 'bing':
+                    url = `https://www.bing.com/search?q=${encodeURIComponent(query)}`;
+                    break;
+                case 'sogou':
+                    url = `https://www.sogou.com/web?query=${encodeURIComponent(query)}`;
+                    break;
+                default:
+                    url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            }
+
+            // 添加搜索日志
+            addSearchLog(query, searchEngine);
+            
+            // 显示加载指示器
+            showLoading();
+            
+            // 延迟打开新标签页，让用户看到加载效果
+            setTimeout(() => {
+                window.open(url, '_blank');
+            }, 500);
+        }
+        
+        document.getElementById('searchQuery').addEventListener('keypress', function(event) {
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+        
+        function changeBackground() {
+            const fileInput = document.getElementById('bgFile');
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+
+            reader.onload = function(e) {
+                document.body.style.backgroundImage = `url(${e.target.result})`;
+            };
+
+            if (file) {
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function switchBackground() {
+            currentBgIndex = (currentBgIndex + 1) % backgrounds.length;
+            
+            // 预加载下一张背景图片
+            preloadImage(`bg${currentBgIndex + 1}.jpg`).then(() => {
+                document.body.style.backgroundImage = backgrounds[currentBgIndex];
+            }).catch(() => {
+                // 如果图片加载失败，使用默认颜色背景
+                document.body.style.backgroundImage = 'none';
+                document.body.style.backgroundColor = '#6a11cb';
+            });
+        }
+        
+        // 创建动画粒子
+        function createParticles() {
+            const particlesContainer = document.getElementById('particles');
+            const particleCount = 25;
+            
+            for (let i = 0; i < particleCount; i++) {
+                const particle = document.createElement('div');
+                particle.classList.add('particle');
+                
+                // 随机大小
+                const size = Math.random() * 20 + 5;
+                particle.style.width = `${size}px`;
+                particle.style.height = `${size}px`;
+                
+                // 随机位置
+                particle.style.left = `${Math.random() * 100}%`;
+                particle.style.top = `${Math.random() * 100 + 100}%`;
+                
+                // 随机颜色
+                const colors = ['rgba(255, 255, 255, 0.7)', 'rgba(200, 230, 255, 0.7)', 'rgba(230, 255, 230, 0.7)'];
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                
+                // 随机动画延迟和持续时间
+                particle.style.animationDelay = `${Math.random() * 15}s`;
+                particle.style.animationDuration = `${Math.random() * 10 + 10}s`;
+                
+                particlesContainer.appendChild(particle);
+            }
+        }
+
+        // 初始化
+        window.onload = function() {
+            // 显示初始加载指示器
+            showLoading();
+            
+            updateDateTime();
+            setInterval(updateDateTime, 1000);
+            createParticles();
+            
+            // 初始化背景
+            const now = new Date();
+            setSmartBackground(now.getDay());
+            
+            // 显示最近的搜索日志
+            displayRecentLogs();
+            
+            // 绑定侧边栏事件
+            document.getElementById('toggleSidebar').addEventListener('click', toggleSidebar);
+            document.getElementById('closeSidebar').addEventListener('click', toggleSidebar);
+        };
+        
+        // 背景管理
+        let currentBgIndex = 1;
+        const backgrounds = [
+            'url("bg1.jpg")',
+            'url("bg2.jpg")',
+            'url("bg3.jpg")',
+            'url("bg4.jpg")',
+            'url("bg5.jpg")',
+            'url("bg6.jpg")',
+            'url("bg7.jpg")'
+        ];
+    </script>
+</body>
+</html>
