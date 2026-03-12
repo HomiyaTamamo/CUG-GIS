@@ -1,0 +1,14 @@
+﻿   Qt/MSBuild: 3.3.0.13
+  Reading Qt configuration (D:/osgeo4w-qgis-dev/QT5/bin/qmake)
+   Qt: 5.11.2
+  moc gisaboutxy.h
+  fstream.cpp
+  gisaboutxy.cpp
+  main.cpp
+D:\osgeo4w-qgis-dev\QGIS-ltr\include\qgsvectorlayer.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+D:\osgeo4w-qgis-dev\QGIS-ltr\include\qgsvectorlayer.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  qrc_gisaboutxy.cpp
+  moc_gisaboutxy.cpp
+D:\osgeo4w-qgis-dev\QGIS-ltr\include\qgsvectorlayer.h(1,1): warning C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+  LINK : 没有找到 D:\homecpp\gisaboutxy\x64\Debug\gisaboutxy.dll 或上一个增量链接没有生成它；正在执行完全链接
+  gisaboutxy.vcxproj -> D:\homecpp\gisaboutxy\x64\Debug\gisaboutxy.dll
