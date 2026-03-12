@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.4.33213.308
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "加密算法·张", "加密算法·张.vcxproj", "{BA8CEF15-96A8-4B45-B847-DB08D7C45053}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Debug|x86 = Debug|x86
+		Release|x64 = Release|x64
+		Release|x86 = Release|x86
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Debug|x64.ActiveCfg = Debug|x64
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Debug|x64.Build.0 = Debug|x64
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Debug|x86.ActiveCfg = Debug|Win32
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Debug|x86.Build.0 = Debug|Win32
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Release|x64.ActiveCfg = Release|x64
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Release|x64.Build.0 = Release|x64
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Release|x86.ActiveCfg = Release|Win32
+		{BA8CEF15-96A8-4B45-B847-DB08D7C45053}.Release|x86.Build.0 = Release|Win32
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E60B642C-2BD7-4C45-A385-A594971FF088}
+	EndGlobalSection
+EndGlobal

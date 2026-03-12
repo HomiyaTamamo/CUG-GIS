@@ -1,0 +1,3 @@
+﻿  加密算法·张.cpp
+D:\HomC++\加密算法·张\加密算法·张.cpp(23,36): warning C4267: “=”: 从“size_t”转换到“int”，可能丢失数据
+  加密算法·张.vcxproj -> D:\HomC++\加密算法·张\x64\Debug\加密算法·张.exe
