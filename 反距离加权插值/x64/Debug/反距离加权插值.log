@@ -1,0 +1,7 @@
+﻿   Qt/MSBuild: 3.3.0.13
+   Qt: 5.11.2
+  MainWindow.cpp
+  main.cpp
+  qrc_MainWindow.cpp
+  moc_MainWindow.cpp
+  反距离加权插值.vcxproj -> D:\homecpp\反距离加权插值\x64\Debug\反距离加权插值.exe
