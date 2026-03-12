@@ -1,0 +1,65 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "张三",
+        "code": 12,
+        "height": 0  
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.61209430782448,
+          40.042530611425896
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "天上的鸟",
+        "code": 13,
+        "height": 120  
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.60900000000000,
+          40.04150000000000
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "还是个鸟",
+        "code": 14,
+        "height": 100  
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.60500000000000,
+          40.04000000000000
+        ]
+      }
+    },
+    {
+      "type": "Feature",
+      "properties": {
+        "name": "确实是鸟",
+        "code": 15,
+        "height": 80  
+      },
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          -75.61700000000000,
+          40.03800000000000
+        ]
+      }
+    }
+  ]
+}

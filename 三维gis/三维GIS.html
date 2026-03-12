@@ -1,0 +1,265 @@
+<!DOCTYPE html> 
+<html>
+<head>
+    <script src="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Cesium.js"></script>
+    <link href="https://cesium.com/downloads/cesiumjs/releases/1.107/Build/Cesium/Widgets/widgets.css" rel="stylesheet">
+    <script src="https://webapi.amap.com/maps?v=2.0&key=93cb6d89b862a4c38cde5be8923d762d&plugin=AMap.Autocomplete,AMap.PlaceSearch,AMap.Walking"></script>
+    <script src="高德引入.js"></script>
+    <script src="通视分析.js"></script>
+    <script src="数据加载.js"></script>
+    <script src="缓冲区分析.js"></script>
+    <link rel="stylesheet" href="./3Dgis.css">
+    <meta name="referrer" content="no-referrer">
+</head>
+<body>
+    <div id="cesiumContainer" style="width:100%; height:100vh;"></div>
+    <div id="toolbar">
+        <button onclick="switchImagery()">切换影像 (当前: 高德地图矢量)</button>
+        <button id="terrainBtn" onclick="switchTerrain()">禁用地形</button>
+        <button onclick="flyToView(0)">北京视角</button>
+        <button onclick="flyToView(1)">未来城视角</button>
+        <button onclick="document.getElementById('modelFileInput').click()">选择文件（glTF/GeoJSON）</button>
+        <button onclick="loadCesium3DTiles()">加载3D Tiles</button>
+        <button id="toggleSelectMode" onclick="toggleSelectMode()">启用选取模式</button>
+        <div id="coordinates">点击地图获取坐标</div>
+        <input type="file" id="modelFileInput" accept=".gltf,.glb,.json,.3dtiles,.geojson" style="display:none" onchange="loadModel()" />
+        <button onclick="openRoutePlanner()">路径规划分析</button>
+        <button onclick="toggleVisibilitySelectMode()">启用通视选取模式</button>
+        <button onclick="promptViewshedAnalysis()">可视域分析</button>
+        <button onclick="openBufferInput()">缓冲区分析</button>
+    </div>
+
+        
+
+<!-- 缓冲区输入弹窗 -->
+<div id="bufferInputModal" style="display:none; position:fixed; top:20%; left:50%; transform:translate(-50%, -20%); background-color:white; padding:20px; border:1px solid #ccc; z-index:1000;">
+    <h3>缓冲区分析参数</h3>
+    <label for="lonInput">经度：</label>
+    <input type="number" id="lonInput" step="0.000001"><br><br>
+    <label for="latInput">纬度：</label>
+    <input type="number" id="latInput" step="0.000001"><br><br>
+    <label for="radiusInput">半径（米）：</label>
+    <input type="number" id="radiusInput" step="1"><br><br>
+    <button onclick="submitBuffer()">确认</button>
+    <button onclick="closeBufferInput()">关闭</button>
+</div>
+
+        </div>
+<div id="routePlannerModal" style="display:none; position:fixed; top:20%; left:35%; background:#fff; padding:20px; border:1px solid #ccc; z-index:1000;">
+    <h3>路径规划</h3>
+    <label for="startPoint">起点：</label>
+    <input type="text" id="startPoint" placeholder="请输入起点地名" style="width:200px;"><br><br>
+    <label for="endPoint">终点：</label>
+    <input type="text" id="endPoint" placeholder="请输入终点地名" style="width:200px;"><br><br>
+    <button onclick="submitRoute()">确认</button>
+    <button onclick="closeRoutePlanner()">取消</button>
+</div>
+<script>
+        const viewer = new Cesium.Viewer('cesiumContainer', {
+            timeline: true,
+            animation: true,
+            baseLayerPicker: true,
+            geocoder: true
+        });
+        // 视角切换
+        function flyToView(index) {
+            const views = [
+                { destination: Cesium.Cartesian3.fromDegrees(116.388056, 39.9075, 2000), orientation: { pitch: Cesium.Math.toRadians(-45) }} ,
+                { destination: Cesium.Cartesian3.fromDegrees(114.614444, 30.461944, 1500), orientation: { heading: Cesium.Math.toRadians(45), pitch: Cesium.Math.toRadians(-30) }}
+            ];
+            viewer.camera.flyTo(views[index]);
+        }
+// 全局存储事件处理器，避免多次创建
+let selectHandler = null;
+let selectMode = false;
+
+function toggleSelectMode() {
+  selectMode = !selectMode;
+  const btn = document.getElementById('toggleSelectMode');
+  if (selectMode) {
+    btn.innerText = '禁用选取模式';
+    activateSelectMode();
+  } else {
+    btn.innerText = '启用选取模式';
+    deactivateSelectMode();
+  }
+}
+
+function activateSelectMode() {
+  // 设置十字光标
+  viewer.scene.canvas.style.cursor = 'crosshair';
+
+  // 创建新的 ScreenSpaceEventHandler
+  selectHandler = new Cesium.ScreenSpaceEventHandler(viewer.scene.canvas);
+  selectHandler.setInputAction((click) => {
+    // 优先使用 pickPosition 获取带地形高度的坐标
+    const cartesian = viewer.scene.pickPosition(click.position);
+    if (!cartesian) {
+      document.getElementById('coordinates').innerText = '未拾取到位置，请再试一次';
+      return;
+    }
+
+    // 笛卡尔转经纬度
+    const carto = Cesium.Cartographic.fromCartesian(cartesian);
+    const lon = Cesium.Math.toDegrees(carto.longitude).toFixed(6);
+    const lat = Cesium.Math.toDegrees(carto.latitude).toFixed(6);
+    const height = carto.height.toFixed(2);
+
+    // 显示结果
+    document.getElementById('coordinates').innerHTML = `
+      <strong>WGS84 (经纬度/高程)：</strong><br>
+      经度: ${lon}°<br>
+      纬度: ${lat}°<br>
+      高程: ${height} m<br>
+      <hr>
+      <strong>笛卡尔坐标 (Cartesian3)：</strong><br>
+      X: ${cartesian.x.toFixed(2)}<br>
+      Y: ${cartesian.y.toFixed(2)}<br>
+      Z: ${cartesian.z.toFixed(2)}
+    `;
+  }, Cesium.ScreenSpaceEventType.LEFT_CLICK);
+}
+
+function deactivateSelectMode() {
+  // 恢复默认光标
+  viewer.scene.canvas.style.cursor = 'default';
+
+  // 移除并销毁事件处理器
+  if (selectHandler) {
+    selectHandler.destroy();
+    selectHandler = null;
+  }
+
+  // 恢复提示文本
+  document.getElementById('coordinates').innerText = '点击地图获取坐标';
+}
+
+// 打开路径规划窗口
+function openRoutePlanner() {
+    document.getElementById('routePlannerModal').style.display = 'block';
+}
+
+// 关闭路径规划窗口
+function closeRoutePlanner() {
+    document.getElementById('routePlannerModal').style.display = 'none';
+}
+
+// 替换 Autocomplete 逻辑（可选）
+const startInput = document.getElementById('startPoint');
+const endInput = document.getElementById('endPoint');
+
+// 路径规划提交
+function submitRoute() {
+    const start = startInput.value.trim();
+    const end = endInput.value.trim();
+    if (!start || !end) {
+        alert('请输入起点和终点');
+        return;
+    }
+
+    closeRoutePlanner();
+    geocodeAndRoute(start, end);
+}
+
+// 地址转坐标并生成路线
+async function geocodeAndRoute(start, end) {
+    const apiKey = '5b3ce3597851110001cf62481a4b2a7e91cd44ddb821239528e9c919'; 
+
+    const geocode = async (query) => {
+        const res = await fetch(`https://api.openrouteservice.org/geocode/search?api_key=${apiKey}&text=${encodeURIComponent(query)}&size=1`);
+        const data = await res.json();
+        if (data.features.length === 0) throw new Error('地址解析失败');
+        const [lon, lat] = data.features[0].geometry.coordinates;
+        return [lon, lat];
+    };
+
+    try {
+        const [startCoord, endCoord] = await Promise.all([
+            geocode(start),
+            geocode(end)
+        ]);
+
+        const res = await fetch('https://api.openrouteservice.org/v2/directions/driving-car/geojson', {
+            method: 'POST',
+            headers: {
+                'Authorization': apiKey,
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                coordinates: [startCoord, endCoord]
+            })
+        });
+
+        const geojson = await res.json();
+        drawRoute(geojson);
+    } catch (err) {
+        console.error(err);
+        alert('路径规划失败，请检查网络或地址');
+    }
+}
+
+// 在地图上绘制路线（假设使用 Cesium + turf.js 或其他支持 GeoJSON 的方式）
+function drawRoute(geojson) {
+    if (!Cesium.GeoJsonDataSource) {
+        console.error("未加载 Cesium.GeoJsonDataSource");
+        return;
+    }
+
+    Cesium.GeoJsonDataSource.load(geojson).then(dataSource => {
+        viewer.dataSources.add(dataSource);
+        viewer.flyTo(dataSource);
+    });
+}
+
+// 初始化视域分析对象
+let viewshed3D = null;
+
+function promptViewshedAnalysis() {
+    // 提示用户输入经度、纬度和半径
+    const lon = parseFloat(prompt("请输入经度（例如：116.388056）："));
+    const lat = parseFloat(prompt("请输入纬度（例如：39.9075）："));
+    const radius = parseFloat(prompt("请输入分析半径（米）：", "5000"));
+
+    if (isNaN(lon) || isNaN(lat) || isNaN(radius)) {
+        alert("输入无效，请输入有效的数字。");
+        return;
+    }
+
+    // 执行可视域分析
+    viewshedAnalysis(lon, lat, radius);
+}
+
+function viewshedAnalysis(centerLon, centerLat, radius) {
+    // 清除之前的分析结果
+    if (viewshed3D) {
+        viewshed3D.destroy();
+        viewshed3D = null;
+    }
+
+    // 创建视域分析对象
+    viewshed3D = new Cesium.ViewShed3D(viewer);
+
+    // 设置观察点位置
+    viewshed3D.viewPosition = [centerLon, centerLat, 10]; // 高度可根据需要调整
+
+    // 设置视域参数
+    viewshed3D.horizontalFov = 90; // 水平视角
+    viewshed3D.verticalFov = 60;   // 垂直视角
+    viewshed3D.distance = radius;  // 分析距离
+
+    // 设置可视区域颜色
+    viewshed3D.visibleAreaColor = Cesium.Color.GREEN.withAlpha(0.5);
+    viewshed3D.invisibleAreaColor = Cesium.Color.RED.withAlpha(0.5);
+
+    // 设置目标点位置（可选）
+    // viewshed3D.setDistDirByPoint([targetLon, targetLat, targetHeight]);
+
+    // 启用视域分析
+    viewshed3D.build();
+}
+
+
+
+</script>
+</body>
+</html>
