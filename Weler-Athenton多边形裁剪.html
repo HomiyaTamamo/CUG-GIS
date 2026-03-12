@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Weiler-Atherton多边形裁剪算法</title>
+    <style>
+        canvas {
+            border: 1px solid #000000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <script>
+        const subjectPolygon = [
+            { x: 100, y: 100 },
+            { x: 200, y: 50 },
+            { x: 400, y: 100 },
+            { x: 300, y: 200 },
+            { x: 200, y: 200 }
+        ];
+
+        const clipPolygon = [
+            { x: 150, y: 150 },
+            { x: 350, y: 150 },
+            { x: 350, y: 350 },
+            { x: 150, y: 350 }
+        ];
+
+        const canvas = document.getElementById("myCanvas");
+        const ctx = canvas.getContext("2d");
+
+        function drawPolygon(polygon, color) {
+            ctx.beginPath();
+            ctx.moveTo(polygon[0].x, polygon[0].y);
+            for (let i = 1; i < polygon.length; i++) {
+                ctx.lineTo(polygon[i].x, polygon[i].y);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = color;
+            ctx.stroke();
+        }
+
+        function weilerAtherton() {
+            let resultPolygon = subjectPolygon; // 假设裁剪后的多边形为 subjectPolygon
+
+            drawPolygon(subjectPolygon, "black");
+            drawPolygon(clipPolygon, "black");
+            drawPolygon(resultPolygon, "red");
+        }
+
+        weilerAtherton();
+    </script>
+</body>
+</html>

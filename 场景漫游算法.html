@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Scene Roaming</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const cubeVertices = [
+            { x: -1, y: -1, z: -1 },
+            { x:  1, y: -1, z: -1 },
+            { x:  1, y:  1, z: -1 },
+            { x: -1, y:  1, z: -1 },
+            { x: -1, y: -1, z:  1 },
+            { x:  1, y: -1, z:  1 },
+            { x:  1, y:  1, z:  1 },
+            { x: -1, y:  1, z:  1 }
+        ];
+
+        const cubeEdges = [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [4, 5], [5, 6], [6, 7], [7, 4],
+            [0, 4], [1, 5], [2, 6], [3, 7]
+        ];
+
+        let camera = { x: 0, y: 0, z: -5, pitch: 0, yaw: 0 };
+
+        function perspectiveProject(vertex) {
+            const focalLength = 2;
+            const scale = focalLength / (focalLength + vertex.z - camera.z);
+            const scaleFactor = 200;
+            return {
+                x: vertex.x * scale * scaleFactor + canvas.width / 2,
+                y: vertex.y * scale * scaleFactor + canvas.height / 2
+            };
+        }
+
+        function rotateX(vertex, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            return {
+                x: vertex.x,
+                y: vertex.y * cos - vertex.z * sin,
+                z: vertex.y * sin + vertex.z * cos
+            };
+        }
+
+        function rotateY(vertex, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            return {
+                x: vertex.x * cos + vertex.z * sin,
+                y: vertex.y,
+                z: -vertex.x * sin + vertex.z * cos
+            };
+        }
+
+        function rotateZ(vertex, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            return {
+                x: vertex.x * cos - vertex.y * sin,
+                y: vertex.x * sin + vertex.y * cos,
+                z: vertex.z
+            };
+        }
+
+        function drawLine(v1, v2) {
+            ctx.beginPath();
+            ctx.moveTo(v1.x, v1.y);
+            ctx.lineTo(v2.x, v2.y);
+            ctx.stroke();
+        }
+
+        function handleKeydown(event) {
+            const speed = 0.1;
+            switch (event.key) {
+                case 'ArrowUp':
+                    camera.z += speed;
+                    break;
+                case 'ArrowDown':
+                    camera.z -= speed;
+                    break;
+                case 'ArrowLeft':
+                    camera.x -= speed;
+                    break;
+                case 'ArrowRight':
+                    camera.x += speed;
+                    break;
+                case 'w':
+                    camera.pitch += 1;
+                    break;
+                case 's':
+                    camera.pitch -= 1;
+                    break;
+                case 'a':
+                    camera.yaw -= 1;
+                    break;
+                case 'd':
+                    camera.yaw += 1;
+                    break;
+            }
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const angle = Date.now() * 0.001;
+            const rotatedVertices = cubeVertices.map(v => rotateX(rotateY(rotateZ(v, angle), angle), angle));
+            const cameraRotatedVertices = rotatedVertices.map(v => {
+                let rv = rotateX(v, camera.pitch);
+                rv = rotateY(rv, camera.yaw);
+                return {
+                    x: rv.x - camera.x,
+                    y: rv.y - camera.y,
+                    z: rv.z
+                };
+            });
+            const projectedVertices = cameraRotatedVertices.map(v => perspectiveProject(v));
+
+            ctx.strokeStyle = '#fff';
+            for (let edge of cubeEdges) {
+                const v1 = projectedVertices[edge[0]];
+                const v2 = projectedVertices[edge[1]];
+                drawLine(v1, v2);
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        window.addEventListener('keydown', handleKeydown);
+        render();
+    </script>
+</body>
+</html>

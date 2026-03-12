@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>纯享版时钟页面</title>
+    <style>
+        body {  
+            font-family: 'Microsoft YaHei', sans-serif;  
+            margin: 0;  
+            padding: 0;  
+            background-color: #000;  
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;  
+        }
+        .clock {
+            display: flex;
+            align-items: center;
+            background-color: #000000;}
+        .digit {
+            height: 300px; 
+            margin: 0 5px; 
+        }
+        .clock img {
+            display: block;
+        } 
+    </style>
+</head>
+<body>
+    <div class="clock" id="clock">
+        <img class="digit" id="hourTens" src="./image/0.png" alt="">
+        <img class="digit" id="hourOnes" src="./image/0.png" alt="">
+        <img class="digit" id="separator1" src="./image/11.png" alt=""> 
+        <img class="digit" id="minuteTens" src="./image/0.png" alt="">
+        <img class="digit" id="minuteOnes" src="./image/0.png" alt="">
+        <img class="digit" id="separator2" src="./image/11.png" alt="">
+        <img class="digit" id="secondTens" src="./image/0.png" alt="">
+        <img class="digit" id="secondOnes" src="./image/0.png" alt="">
+    </div>
+    <script>
+        let clockVisible = true;
+        const toggleButton = document.getElementById('toggleButton');
+
+        function toggleClock() {
+            const clock = document.getElementById('clock');
+            if (clockVisible) {
+                clock.style.display = 'none';
+                toggleButton.style.backgroundImage = "url('./image/clockhide.png')";
+                clockVisible = false;
+            } else {
+                clock.style.display = 'flex';
+                toggleButton.style.backgroundImage = "url('./image/clockshow.png')";
+                clockVisible = true;
+            }
+        }
+    </script>
+
+        <script>
+            function updateClock() {
+            var now = new Date();
+            var hours = now.getHours().toString().padStart(2, '0');
+            var minutes = now.getMinutes().toString().padStart(2, '0');
+            var seconds = now.getSeconds().toString().padStart(2, '0');
+
+            // 更新小时的图片
+            document.getElementById('hourTens').src ="./image/"+ hours[0] + ".png";
+            document.getElementById('hourOnes').src ="./image/"+ hours[1] + ".png";
+
+            // 更新分钟的图片
+            document.getElementById('minuteTens').src ="./image/"+ minutes[0] + ".png";
+            document.getElementById('minuteOnes').src ="./image/"+ minutes[1] + ".png";
+
+            // 更新秒的图片
+            document.getElementById('secondTens').src ="./image/"+ seconds[0] + ".png";
+            document.getElementById('secondOnes').src ="./image/"+ seconds[1] + ".png";
+            replaceSeparatorImage();}
+            function replaceSeparatorImage() {
+            var separator1 = document.getElementById('separator1');
+            var separator2 = document.getElementById('separator2');
+            if (separator1.src.includes("./image/11.png")) {
+                separator1.src = "./image/12.png"; 
+                separator2.src = "./image/11.png"; 
+            } else {
+                separator1.src = "./image/11.png"; 
+                separator2.src = "./image/12.png"; 
+            }
+        }
+
+
+        // 更新时钟
+        setInterval(updateClock, 1000);
+        </script>
+</body>
+</html>

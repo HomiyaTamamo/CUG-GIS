@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDA Algorithm Line Drawing</title>
+<style>
+    canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+<canvas id="myCanvas" width="800" height="400"></canvas>
+<script>
+    const canvas = document.getElementById('myCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawLineDDA(x1, y1, x2, y2) {
+        const dx = x2 - x1;
+        const dy = y2 - y1;
+        const steps = Math.max(Math.abs(dx), Math.abs(dy));
+        const xIncrement = dx / steps;
+        const yIncrement = dy / steps;
+
+        let x = x1;
+        let y = y1;
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+
+        for (let i = 1; i <= steps; i++) {
+            x += xIncrement;
+            y += yIncrement;
+            ctx.lineTo(Math.round(x), Math.round(y));
+        }
+
+        ctx.stroke();
+    }
+
+    drawLineDDA(50, 50, 200, 200); // 从点(50, 50)到点(200, 200)画一条直线
+
+</script>
+</body>
+</html>

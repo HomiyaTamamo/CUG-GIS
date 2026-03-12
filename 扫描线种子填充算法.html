@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas" width="800" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // 绘制一个五边形
+  function drawPolygon(points, color) {
+    ctx.beginPath();
+    ctx.moveTo(points[0].x, points[0].y);
+    for (let i = 1; i < points.length; i++) {
+      ctx.lineTo(points[i].x, points[i].y);
+    }
+    ctx.closePath();
+    ctx.fillStyle = color;
+    ctx.fill();
+    scanLineSeedFill(50, 50, 'black', 'red');
+  }
+
+// 扫描线种子填充算法
+function scanLineSeedFill(x, y, newColor, oldColor) {
+    if (ctx.fillStyle !== oldColor) {
+      return;
+    }
+
+    ctx.fillStyle = newColor;
+    ctx.fillRect(x, y, 1, 1);
+
+    let minY = Infinity;
+    let maxY = -Infinity;
+    let inside = false;
+
+    for (let i = 0; i < polygonPoints.length; i++) {
+      const j = (i + 1) % polygonPoints.length;
+      const pi = polygonPoints[i];
+      const pj = polygonPoints[j];
+
+      if ((pi.y > y) !== (pj.y > y) && x < (pj.x - pi.x) * (y - pi.y) / (pj.y - pi.y) + pi.x) {
+        inside = !inside;
+      }
+
+      if (pi.y > y && pj.y > y) {
+        minY = Math.min(minY, pi.y, pj.y);
+      } else if (pi.y <= y && pj.y <= y) {
+        maxY = Math.max(maxY, pi.y, pj.y);
+      }
+    }
+
+    if (inside) {
+      for (let y = minY; y <= maxY; y++) {
+        scanLineSeedFill(x, y, newColor, oldColor);
+      }
+    }
+  }
+
+  // 定义五边形的顶点坐标
+  const polygonPoints = [
+    { x: 50, y: 50 },
+    { x: 150, y: 50 },
+    { x: 175, y: 75 },
+    { x: 125, y: 100 },
+    { x: 75, y: 100 },
+    { x: 50, y: 50 }
+  ];
+// 使用扫描线种子填充算法填充五边形内区域
+scanLineSeedFill(50, 50, 'black', 'red');
+  // 调用函数绘制一个五边形
+  drawPolygon(polygonPoints, 'red');
+
+  
+</script>
+
+</body>
+</html>

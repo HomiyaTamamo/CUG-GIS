@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Bezier Curve</title>
+    <style>
+        canvas {
+          border: 1px solid black;
+        }
+      </style>
+    
+</head>
+<body>
+    <canvas id="myCanvas" width="400" height="400"></canvas>
+    <script>
+        function drawBezierCurve(points) {
+            let canvas = document.getElementById('myCanvas');
+            let ctx = canvas.getContext('2d');
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+
+            for (let t = 0; t <= 1; t += 0.01) {
+                let x = Math.pow(1 - t, 3) * points[0].x + 3 * t * Math.pow(1 - t, 2) * points[1].x + 3 * Math.pow(t, 2) * (1 - t) * points[2].x + Math.pow(t, 3) * points[3].x;
+                let y = Math.pow(1 - t, 3) * points[0].y + 3 * t * Math.pow(1 - t, 2) * points[1].y + 3 * Math.pow(t, 2) * (1 - t) * points[2].y + Math.pow(t, 3) * points[3].y;
+                ctx.lineTo(x, y);
+            }
+
+            ctx.stroke();
+        }
+
+        let points = [{x: 50, y: 100}, {x: 150, y: 50}, {x: 250, y: 150}, {x: 350, y: 100}];
+        drawBezierCurve(points);
+    </script>
+</body>
+</html>

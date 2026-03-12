@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Parallel Projections</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #000;
+        }
+        button {
+            margin: 10px;
+        }
+    </style>
+</head>
+<body>
+    <button onclick="setProjection('orthographic')">正投影</button>
+    <button onclick="setProjection('isometric')">正等测</button>
+    <button onclick="setProjection('dimetric')">正二测</button>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const cubeVertices = [
+            { x: -1, y: -1, z: -1 },
+            { x:  1, y: -1, z: -1 },
+            { x:  1, y:  1, z: -1 },
+            { x: -1, y:  1, z: -1 },
+            { x: -1, y: -1, z:  1 },
+            { x:  1, y: -1, z:  1 },
+            { x:  1, y:  1, z:  1 },
+            { x: -1, y:  1, z:  1 }
+        ];
+
+        const cubeEdges = [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [4, 5], [5, 6], [6, 7], [7, 4],
+            [0, 4], [1, 5], [2, 6], [3, 7]
+        ];
+
+        let projectionType = 'orthographic';
+
+        function orthographicProjection(vertex) {
+            const scaleFactor = 200;
+            return {
+                x: vertex.x * scaleFactor + canvas.width / 2,
+                y: vertex.y * scaleFactor + canvas.height / 2
+            };
+        }
+
+        function isometricProjection(vertex) {
+            const angle = Math.PI / 6;
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            const scaleFactor = 100;
+            return {
+                x: (vertex.x - vertex.z) * cos * scaleFactor + canvas.width / 2,
+                y: (vertex.x + vertex.z) * sin * scaleFactor - vertex.y * scaleFactor + canvas.height / 2
+            };
+        }
+
+        function dimetricProjection(vertex) {
+            const angleX = Math.PI / 6;
+            const angleY = Math.PI / 4;
+            const cosX = Math.cos(angleX);
+            const sinX = Math.sin(angleX);
+            const cosY = Math.cos(angleY);
+            const sinY = Math.sin(angleY);
+            const scaleFactor = 100;
+            return {
+                x: (vertex.x * cosY - vertex.z * sinY) * scaleFactor + canvas.width / 2,
+                y: (vertex.x * sinX * sinY + vertex.y * cosX - vertex.z * cosX * sinY) * scaleFactor + canvas.height / 2
+            };
+        }
+
+        function project(vertex) {
+            switch (projectionType) {
+                case 'orthographic':
+                    return orthographicProjection(vertex);
+                case 'isometric':
+                    return isometricProjection(vertex);
+                case 'dimetric':
+                    return dimetricProjection(vertex);
+                default:
+                    return orthographicProjection(vertex);
+            }
+        }
+
+        function setProjection(type) {
+            projectionType = type;
+            render();
+        }
+
+        function drawLine(v1, v2) {
+            ctx.beginPath();
+            ctx.moveTo(v1.x, v1.y);
+            ctx.lineTo(v2.x, v2.y);
+            ctx.stroke();
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const projectedVertices = cubeVertices.map(v => project(v));
+
+            ctx.strokeStyle = '#fff';
+            for (let edge of cubeEdges) {
+                const v1 = projectedVertices[edge[0]];
+                const v2 = projectedVertices[edge[1]];
+                drawLine(v1, v2);
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>

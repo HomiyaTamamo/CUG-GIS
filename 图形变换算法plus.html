@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graphic Transformation</title>
+    <style>
+        canvas {
+          border: 1px solid black;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="tails" width=400 height=600 style="border: 1px slateblue dashed;display: block;margin: 50px auto;">
+        <script>
+            var canvas = document.getElementById("tails");
+            var context = canvas.getContext('2d');
+            //画文字
+            context.textAlign="center";
+            context.fillStyle="green";
+            context.font="bold 50px Arial";
+            context.fillText("Happy Trails!",200,50);
+            //先画个小树
+            DrawTreen(context,1,1,130, 250);
+
+            //再画一个大树
+            DrawTreen(context,1.4,1.4,200,500);
+            context.save();
+            context.translate(-10, 350);
+            context.beginPath();
+            context.moveTo(0, 0);
+            context.quadraticCurveTo(170, -50, 260, -190);
+            context.quadraticCurveTo(310, -250, 410, -250);
+            context.strokeStyle = 'chocolate';
+            context.lineWidth = 20;
+            context.stroke();
+            context.restore();
+            //画树函数
+            function DrawTreen(context,x1,y1,x2,y2) {
+
+                DrawShadow(context,x1,y1,x2,y2);
+                context.save();
+                context.translate(x2,y2);
+                context.scale(x1,y1);
+                context.shadowBlur = 14;
+                context.beginPath();
+                context.moveTo(-25, -50);
+                context.lineTo(-10, -80);
+                context.lineTo(-20, -80);
+                context.lineTo(-5, -110);
+                context.lineTo(-15, -110);
+                context.lineTo(0, -140);
+                context.lineTo(15, -110);
+                context.lineTo(5, -110);
+                context.lineTo(20, -80);
+                context.lineTo(10, -80);
+                context.lineTo(25, -50);
+                context.closePath();
+                context.fillStyle = 'green';
+                context.fill();
+                context.fillStyle = 'black'
+                context.fillRect(-5, -50, 10, 50);
+                context.stroke();
+                context.restore();
+            }
+            //画阴影
+            function DrawShadow(context,x1,y1,x2,y2){
+                context.save();
+                context.translate(x2,y2);
+                context.scale(x1,y1);
+                context.transform(1, 0, -0.5, 0.6, 0, 0)
+                context.beginPath();
+                context.moveTo(-25, -50);
+                context.lineTo(-10, -80);
+                context.lineTo(-20, -80);
+                context.lineTo(-5, -110);
+                context.lineTo(-15, -110);
+                context.lineTo(0, -140);
+                context.lineTo(15, -110);
+                context.lineTo(5, -110);
+                context.lineTo(20, -80);
+                context.lineTo(10, -80);
+                context.lineTo(25, -50);
+                context.closePath();
+                context.fillStyle = 'rgba(0, 0, 0,0.3)';
+                context.fill();
+                context.fillStyle = 'rgba(0, 0, 0, 0.3)'
+                context.fillRect(-5, -50, 10, 50);
+                //                  context.stroke();
+                context.restore();
+            }
+        </script>
+    </canvas>
+</body>
+</html>

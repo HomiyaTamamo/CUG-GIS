@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Midpoint Circle Algorithm</title>
+  <style>
+    #canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="400"></canvas>
+  <script>
+    function DDALine(x1, y1, x2, y2, color) {
+      const canvas = document.getElementById('canvas');
+      const ctx = canvas.getContext('2d');
+      const dx = x2 - x1;
+      const dy = y2 - y1;
+
+      // calculate steps required for generating pixels
+      const steps = Math.abs(dx) > Math.abs(dy) ? Math.abs(dx) : Math.abs(dy);
+
+      // calculate increment in x & y for each step
+      const Xinc = dx / steps;
+      const Yinc = dy / steps;
+
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+
+      for (let i = 0; i <= steps; i++) {
+        const x = x1 + Xinc * i;
+        const y = y1 + Yinc * i;
+        ctx.lineTo(Math.round(x), Math.round(y));
+      }
+
+      ctx.strokeStyle = color;
+      ctx.lineWidth = 1;
+      ctx.stroke();
+    }
+
+    function main() {
+      const x = 1;
+      const y = 1;
+      const xEnd = 100;
+      const yEnd = 200;
+      const color = 'red';
+      DDALine(x, y, xEnd, yEnd, color);
+    }
+
+    main();
+    </script>
+</body>

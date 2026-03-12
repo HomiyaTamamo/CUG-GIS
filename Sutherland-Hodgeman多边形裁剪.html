@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sutherland-Hodgeman多边形裁剪算法</title>
+    <style>
+        canvas {
+            border: 1px solid #000000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <button onclick="clipPolygon()">裁剪多边形</button>
+    <script>
+        function clipPolygon() {
+            let canvas = document.getElementById("myCanvas");
+            let ctx = canvas.getContext("2d");
+
+            // 定义原始多边形顶点
+            let polygon = [
+                [100, 100],
+                [200, 50],
+                [400, 100],
+                [300, 200],
+                [200, 200]
+            ];
+
+            // 定义裁剪窗口边界
+            let clipWindow = [
+                [150, 150],
+                [350, 150],
+                [350, 350],
+                [150, 350]
+            ];
+
+            // 清除画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制原始多边形
+            ctx.beginPath();
+            ctx.moveTo(polygon[0][0], polygon[0][1]);
+            for (let i = 1; i < polygon.length; i++) {
+                ctx.lineTo(polygon[i][0], polygon[i][1]);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = "black";
+            ctx.stroke();
+
+            // 裁剪多边形
+            let clippedPolygon = sutherlandHodgeman(polygon, clipWindow);
+
+            // 绘制裁剪后的多边形
+            ctx.beginPath();
+            ctx.moveTo(clippedPolygon[0][0], clippedPolygon[0][1]);
+            for (let i = 1; i < clippedPolygon.length; i++) {
+                ctx.lineTo(clippedPolygon[i][0], clippedPolygon[i][1]);
+            }
+            ctx.closePath();
+            ctx.strokeStyle = "red";
+            ctx.stroke();
+        }
+
+        function sutherlandHodgeman(polygon, clipWindow) {
+            let output = polygon;
+            for (let i = 0; i < clipWindow.length; i++) {
+                let input = output;
+                output = [];
+                let S = clipWindow[i];
+                let E = clipWindow[(i + 1) % clipWindow.length];
+
+                for (let j = 0; j < input.length; j++) {
+                    let P = input[j];
+                    let Q = input[(j + 1) % input.length];
+
+                    if (isInside(P, S, E)) {
+                        if (!isInside(Q, S, E)) {
+                            output.push(computeIntersection(P, Q, S, E));
+                        }
+                        output.push(Q);
+                    } else if (isInside(Q, S, E)) {
+                        output.push(computeIntersection(P, Q, S, E));
+                    }
+                }
+            }
+            return output;
+        }
+
+        function isInside(P, S, E) {
+            return (E[0] - S[0]) * (P[1] - S[1]) > (E[1] - S[1]) * (P[0] - S[0]);
+        }
+
+        function computeIntersection(P, Q, S, E) {
+            let x = ((P[0] * Q[1] - P[1] * Q[0]) * (S[0] - E[0]) - (P[0] - Q[0]) * (S[0] * E[1] - S[1] * E[0])) /
+                    ((P[0] - Q[0]) * (S[1] - E[1]) - (P[1] - Q[1]) * (S[0] - E[0]));
+            let y = ((P[0] * Q[1] - P[1] * Q[0]) * (S[1] - E[1]) - (P[1] - Q[1]) * (S[0] * E[1] - S[1] * E[0])) /
+                    ((P[0] - Q[0]) * (S[1] - E[1]) - (P[1] - Q[1]) * (S[0] - E[0]));
+            return [x, y];
+        }
+    </script>
+</body>
+</html>

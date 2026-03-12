@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DDA Algorithm Line Drawing</title>
+<style>
+    canvas {
+        border: 1px solid black;
+    }
+</style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="400"></canvas>
+
+  <script>
+    function midpoint(x1, y1, x2, y2) {
+      var midX = (x1 + x2) / 2;
+      var midY = (y1 + y2) / 2;
+      return [midX, midY];
+    }
+
+    var canvas = document.getElementById('canvas');
+    var ctx = canvas.getContext('2d');
+
+    // 起点和终点坐标
+    var x1 = 50, y1 = 50;
+    var x2 = 200, y2 = 200;
+
+    // 计算中点坐标
+    var mid = midpoint(x1, y1, x2, y2);
+
+    // 绘制直线
+    ctx.beginPath();
+    ctx.moveTo(x1, y1);
+    ctx.lineTo(x2, y2);
+    ctx.stroke();
+
+    // 绘制中点
+    ctx.beginPath();
+    ctx.arc(mid[0], mid[1], 5, 0, 2 * Math.PI);
+    ctx.fill();
+  </script>
+</body>
+</html>

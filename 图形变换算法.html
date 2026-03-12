@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Graphic Transformation</title>
+    <style>
+        canvas {
+          border: 1px solid black;
+        }
+      </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <script>
+        let canvas = document.getElementById('myCanvas');
+        let ctx = canvas.getContext('2d');
+
+        //定义形状（三角形）
+        let shape = [
+            { x: 100, y: 100 },
+            { x: 150, y: 150 },
+            { x: 50, y: 150 }
+        ];
+
+        //绘制图形
+        function drawShape(points) {
+            ctx.beginPath();
+            ctx.moveTo(points[0].x, points[0].y);
+            for (let i = 1; i < points.length; i++) {
+                ctx.lineTo(points[i].x, points[i].y);
+            }
+            ctx.closePath();
+            ctx.stroke();
+        }
+
+        //将形状平移（dx，dy）
+        function translateShape(points, dx, dy) {
+            return points.map(point => ({ x: point.x + dx, y: point.y + dy }));
+        }
+
+        //将形状围绕中心点（cx，cy）旋转角度（以弧度为单位）
+        function rotateShape(points, cx, cy, angle) {
+            return points.map(point => {
+                let x = cx + (point.x - cx) * Math.cos(angle) - (point.y - cy) * Math.sin(angle);
+                let y = cy + (point.x - cx) * Math.sin(angle) + (point.y - cy) * Math.cos(angle);
+                return { x, y };
+            });
+        }
+
+        
+        drawShape(shape);
+
+        //将形状平移（50，50）并绘制
+        let translatedShape = translateShape(shape, 50, 50);
+        drawShape(translatedShape);
+
+        //将平移的形状围绕（150,150）旋转45度，然后绘制
+        let rotatedShape = rotateShape(translatedShape, 150, 150, Math.PI / 4);
+        drawShape(rotatedShape);
+    </script>
+</body>
+</html>

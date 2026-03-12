@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Liang-Barsky线段裁剪算法</title>
+    <style>
+        canvas {
+            border: 1px solid #000000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="myCanvas" width="500" height="500"></canvas>
+    <button onclick="clipLine()">裁剪线段</button>
+    <script>
+        function liangBarsky(x1, y1, x2, y2, xMin, yMin, xMax, yMax) {
+            let t0 = 0;
+            let t1 = 1;
+            let dx = x2 - x1;
+            let dy = y2 - y1;
+            
+            let p = [-dx, dx, -dy, dy];
+            let q = [x1 - xMin, xMax - x1, y1 - yMin, yMax - y1];
+
+            for (let i = 0; i < 4; i++) {
+                if (p[i] === 0) {
+                    if (q[i] < 0) {
+                        return null;
+                    }
+                } else {
+                    let t = q[i] / p[i];
+                    if (p[i] < 0) {
+                        t0 = Math.max(t0, t);
+                    } else {
+                        t1 = Math.min(t1, t);
+                    }
+                }
+            }
+
+            if (t0 > t1) {
+                return null;
+            }
+
+            let x0 = x1 + t0 * dx;
+            let y0 = y1 + t0 * dy;
+            let x3 = x1 + t1 * dx;
+            let y3 = y1 + t1 * dy;
+
+            return [x0, y0, x3, y3];
+        }
+
+        function clipLine() {
+            let canvas = document.getElementById("myCanvas");
+            let ctx = canvas.getContext("2d");
+            let x1 = 50;
+            let y1 = 50;
+            let x2 = 450;
+            let y2 = 450;
+            let xMin = 100;
+            let yMin = 100;
+            let xMax = 400;
+            let yMax = 400;
+
+            // 清除画布
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            // 绘制原线段（黑色）
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.strokeStyle = "black"; // 设置线条颜色为黑色
+            ctx.stroke();
+
+            // 绘制矩形
+            ctx.beginPath();
+            ctx.rect(xMin, yMin, xMax - xMin, yMax - yMin);
+            ctx.stroke();
+
+            let result = liangBarsky(x1, y1, x2, y2, xMin, yMin, xMax, yMax);
+            if (result) {
+                // 绘制被裁剪的线段部分（红色）
+                ctx.beginPath();
+                ctx.moveTo(result[0], result[1]);
+                ctx.lineTo(result[2], result[3]);
+                ctx.strokeStyle = "red"; // 设置线条颜色为红色
+                ctx.stroke();
+            } else {
+                alert("线段与矩形无交点");
+            }
+        }
+    </script>
+</body>
+</html>

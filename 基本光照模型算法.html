@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Basic Lighting Model</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #000;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const circleCenter = { x: canvas.width / 2, y: canvas.height / 2 };
+        const circleRadius = 100;
+        const light = { x: canvas.width / 2, y: canvas.height / 2 - 150, intensity: 1 };
+        const material = { ambient: 0.2, diffuse: 0.8 };
+
+        function basicLighting(point, normal) {
+            const lightDir = normalize(subtract(light, point));
+            const ambient = material.ambient;
+            const diff = Math.max(dot(normal, lightDir), 0);
+            const diffuse = material.diffuse * diff;
+            return ambient + diffuse;
+        }
+
+        function subtract(v1, v2) {
+            return { x: v1.x - v2.x, y: v1.y - v2.y };
+        }
+
+        function normalize(v) {
+            const length = Math.sqrt(v.x * v.x + v.y * v.y);
+            return { x: v.x / length, y: v.y / length };
+        }
+
+        function dot(v1, v2) {
+            return v1.x * v2.x + v1.y * v2.y;
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            for (let y = -circleRadius; y < circleRadius; y++) {
+                for (let x = -circleRadius; x < circleRadius; x++) {
+                    const distance = Math.sqrt(x * x + y * y);
+                    if (distance < circleRadius) {
+                        const point = { x: circleCenter.x + x, y: circleCenter.y + y };
+                        const normal = normalize({ x: x, y: y });
+
+                        const intensity = basicLighting(point, normal) * 255;
+                        const color = Math.floor(intensity);
+
+                        ctx.fillStyle = `rgb(${color}, ${color}, ${color})`;
+                        ctx.fillRect(point.x, point.y, 1, 1);
+                    }
+                }
+            }
+        }
+
+        render();
+    </script>
+</body>
+</html>

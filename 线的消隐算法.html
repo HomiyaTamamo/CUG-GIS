@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hidden Line Removal</title>
+    <style>
+        canvas {
+            display: block;
+            margin: 0 auto;
+            background-color: #fff;
+        }
+    </style>
+</head>
+<body>
+    <canvas id="canvas" width="800" height="600"></canvas>
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+
+        const cubeVertices = [
+            { x: -1, y: -1, z: -1 },
+            { x:  1, y: -1, z: -1 },
+            { x:  1, y:  1, z: -1 },
+            { x: -1, y:  1, z: -1 },
+            { x: -1, y: -1, z:  1 },
+            { x:  1, y: -1, z:  1 },
+            { x:  1, y:  1, z:  1 },
+            { x: -1, y:  1, z:  1 }
+        ];
+
+        const cubeEdges = [
+            [0, 1], [1, 2], [2, 3], [3, 0],
+            [4, 5], [5, 6], [6, 7], [7, 4],
+            [0, 4], [1, 5], [2, 6], [3, 7]
+        ];
+
+        const camera = { x: 0, y: 0, z: -5 };
+
+        function project(vertex) {
+            const scale = 300 / (camera.z - vertex.z);
+            return {
+                x: vertex.x * scale + canvas.width / 2,
+                y: vertex.y * scale + canvas.height / 2,
+                z: vertex.z
+            };
+        }
+
+        function rotateX(vertex, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            return {
+                x: vertex.x,
+                y: vertex.y * cos - vertex.z * sin,
+                z: vertex.y * sin + vertex.z * cos
+            };
+        }
+
+        function rotateY(vertex, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            return {
+                x: vertex.x * cos + vertex.z * sin,
+                y: vertex.y,
+                z: -vertex.x * sin + vertex.z * cos
+            };
+        }
+
+        function rotateZ(vertex, angle) {
+            const cos = Math.cos(angle);
+            const sin = Math.sin(angle);
+            return {
+                x: vertex.x * cos - vertex.y * sin,
+                y: vertex.x * sin + vertex.y * cos,
+                z: vertex.z
+            };
+        }
+
+        function drawLine(v1, v2) {
+            ctx.beginPath();
+            ctx.moveTo(v1.x, v1.y);
+            ctx.lineTo(v2.x, v2.y);
+            ctx.stroke();
+        }
+
+        function render() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            const angle = Date.now() * 0.001;
+            const rotatedVertices = cubeVertices.map(v => rotateX(rotateY(rotateZ(v, angle), angle), angle));
+            const projectedVertices = rotatedVertices.map(v => project(v));
+
+            const zBuffer = Array(canvas.width * canvas.height).fill(Infinity);
+
+            for (let edge of cubeEdges) {
+                const v1 = projectedVertices[edge[0]];
+                const v2 = projectedVertices[edge[1]];
+
+                const z1 = rotatedVertices[edge[0]].z;
+                const z2 = rotatedVertices[edge[1]].z;
+
+                if (v1.z < zBuffer[Math.floor(v1.x) + Math.floor(v1.y) * canvas.width] || 
+                    v2.z < zBuffer[Math.floor(v2.x) + Math.floor(v2.y) * canvas.width]) {
+                    drawLine(v1, v2);
+                    zBuffer[Math.floor(v1.x) + Math.floor(v1.y) * canvas.width] = v1.z;
+                    zBuffer[Math.floor(v2.x) + Math.floor(v2.y) * canvas.width] = v2.z;
+                }
+            }
+
+            requestAnimationFrame(render);
+        }
+
+        render();
+    </script>
+</body>
+</html>

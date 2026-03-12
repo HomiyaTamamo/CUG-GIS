@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <style>
+    canvas {
+      border: 1px solid black;
+    }
+  </style>
+</head>
+<body>
+
+<canvas id="canvas" width="800" height="400"></canvas>
+
+<script>
+  const canvas = document.getElementById('canvas');
+  const ctx = canvas.getContext('2d');
+
+  // 绘制一个圆
+  function drawCircle(x, y, radius, color) {
+    ctx.beginPath();
+    ctx.arc(x, y, radius, 0, 2 * Math.PI);
+    ctx.fillStyle = color;
+    ctx.fill();
+    ctx.closePath();
+  }
+
+  // 简单种子填充算法
+  function simpleSeedFill(ctx, x, y, newColor, oldColor) {
+    if (ctx.getImageData(x, y, 1, 1).data[3] !== oldColor) {
+        return;
+    }
+
+    ctx.fillStyle = newColor;
+    ctx.fillRect(x, y, 1, 1);
+
+    // 上
+    if (y > 0) {
+        simpleSeedFill(ctx, x, y - 1, newColor, oldColor);
+    }
+
+    // 下
+    if (y < canvas.height - 1) {
+        simpleSeedFill(ctx, x, y + 1, newColor, oldColor);
+    }
+
+    // 左
+    if (x > 0) {
+        simpleSeedFill(ctx, x - 1, y, newColor, oldColor);
+    }
+
+    // 右
+    if (x < canvas.width - 1) {
+        simpleSeedFill(ctx, x + 1, y, newColor, oldColor);
+    }
+}
+
+  // 调用函数绘制一个圆
+  drawCircle(100, 100, 50, 'black');
+
+  // 使用简单种子填充算法填充圆内区域
+  simpleSeedFill(ctx, 101, 101, 'green', 'black');
+</script>
+
+</body>
+</html>

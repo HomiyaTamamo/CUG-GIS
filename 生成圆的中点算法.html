@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Midpoint Circle Algorithm</title>
+  <style>
+    #canvas {
+      border: 1px solid #000;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="canvas" width="800" height="400"></canvas>
+
+  <script>
+    function drawCircle(centerX, centerY, radius) {
+      var canvas = document.getElementById('canvas');
+      var ctx = canvas.getContext('2d');
+
+      var x = radius - 1;
+      var y = 0;
+      var dx = 1;
+      var dy = 1;
+      var err = dx - (radius << 1);
+
+      while (x >= y) {
+        ctx.fillRect(centerX + x, centerY + y, 1, 1);
+        ctx.fillRect(centerX + y, centerY + x, 1, 1);
+        ctx.fillRect(centerX - y, centerY + x, 1, 1);
+        ctx.fillRect(centerX - x, centerY + y, 1, 1);
+        ctx.fillRect(centerX - x, centerY - y, 1, 1);
+        ctx.fillRect(centerX - y, centerY - x, 1, 1);
+        ctx.fillRect(centerX + y, centerY - x, 1, 1);
+        ctx.fillRect(centerX + x, centerY - y, 1, 1);
+
+        if (err <= 0) {
+          y++;
+          err += dy;
+          dy += 2;
+        }
+
+        if (err > 0) {
+          x--;
+          dx += 2;
+          err += dx - (radius << 1);
+        }
+      }
+    }
+
+    // 圆心坐标和半径
+    var centerX = 200, centerY = 200;
+    var radius = 100;
+
+    // 绘制圆
+    drawCircle(centerX, centerY, radius);
+  </script>
+</body>
+</html>
