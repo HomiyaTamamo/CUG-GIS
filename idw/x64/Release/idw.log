@@ -1,0 +1,9 @@
+﻿   Qt/MSBuild: 3.3.0.13
+   Qt: 5.11.2
+  moc MainWindow.h
+  MainWindow.cpp
+  main.cpp
+D:\homecpp\idw\idw\MainWindow.cpp(14,28): error C2614: “MainWindow”: 非法的成员初始化:“view”不是基或成员
+D:\homecpp\idw\idw\MainWindow.cpp(29,5): error C2065: “view”: 未声明的标识符
+D:\homecpp\idw\idw\MainWindow.cpp(73,5): error C2065: “view”: 未声明的标识符
+D:\homecpp\idw\idw\MainWindow.cpp(79,23): error C2065: “view”: 未声明的标识符
